@@ -105,50 +105,75 @@ int main()
 /* Modul untuk membuat tampilan papan 3x3 */
 void Draw3x3Board(char**board)
 {
-	system("cls");
-	printf("\n  %c | %c | %c \n",board[0][0],board[0][1],board[0][2]);
-    printf(" ---+---+---\n");
-    printf("  %c | %c | %c \n",board[1][0],board[1][1],board[1][2]);
-    printf(" ---+---+---\n");
-    printf("  %c | %c | %c \n",board[2][0],board[2][1],board[2][2]);
+    system("cls");
+    printf("\n\n\tTic Tac Toe\n\n");
+    printf("Player 1 (X) -- Player 2 (O)\n\n");
+    printf(" _________________\n");
+    printf("|     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |\n",board[0][0],board[0][1],board[0][2]);
+    printf("|_____|_____|_____|\n");
+    printf("|     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |\n",board[1][0],board[1][1],board[1][2]);
+    printf("|_____|_____|_____|\n");
+    printf("|     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |\n",board[2][0],board[2][1],board[2][2]);
+    printf("|_____|_____|_____|\n");
     printf("\n\n");
 }
 
 /* Modul untuk membuat tampilan papan 5x5 */
 void Draw5x5Board(char**board)
 {
-	system("cls");
-	printf("\n  %c | %c | %c | %c | %c \n",board[0][0],board[0][1],board[0][2],board[0][3],board[0][4]);
-    printf(" ---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c \n",board[1][0],board[1][1],board[1][2],board[1][3],board[1][4]);
-    printf(" ---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c \n",board[2][0],board[2][1],board[2][2],board[2][3],board[2][4]);
-    printf(" ---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c \n",board[3][0],board[3][1],board[3][2],board[3][3],board[3][4]);
-    printf(" ---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c \n",board[4][0],board[4][1],board[4][2],board[4][3],board[4][4]);
-    
+    system("cls");
+    printf("\n\n\tTic Tac Toe\n\n");
+    printf("Player 1 (X) -- Player 2 (O)\n\n");
+    printf(" _____________________________\n");
+    printf("|     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[0][0],board[0][1],board[0][2],board[0][3],board[0 ][4]);
+    printf("|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[1][0],board[1][1],board[1][2],board[1][3],board[1][4]);
+    printf("|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[2][0],board[2][1],board[2][2],board[2][3],board[2][4]);
+    printf("|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[3][0],board[3][1],board[3][2],board[3][3],board[3][4]);
+    printf("|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[4][0],board[4][1],board[4][2],board[4][3],board[4][4]);
+    printf("|_____|_____|_____|_____|_____|\n");
     printf("\n\n");
 }
 
 /* Modul untuk membuat tampilan papan 7x7 */
 void Draw7x7Board(char**board)
 {
-	system("cls");
-	printf("\n  %c | %c | %c | %c | %c | %c | %c \n",board[0][0],board[0][1],board[0][2],board[0][3],board[0][4], board[0][5],board[0][6]);
-    printf(" ---+---+---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c | %c | %c \n",board[1][0],board[1][1],board[1][2],board[1][3],board[1][4], board[1][5],board[1][6]);
-    printf(" ---+---+---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c | %c | %c \n",board[2][0],board[2][1],board[2][2],board[2][3],board[2][4], board[2][5],board[2][6]);
-    printf(" ---+---+---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c | %c | %c \n",board[3][0],board[3][1],board[3][2],board[3][3],board[3][4], board[3][5],board[3][6]);
-    printf(" ---+---+---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c | %c | %c \n",board[4][0],board[4][1],board[4][2],board[4][3],board[4][4], board[4][5],board[4][6]);
-    printf(" ---+---+---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c | %c | %c \n",board[5][0],board[5][1],board[5][2],board[5][3],board[5][4], board[5][5],board[5][6]);
-    printf(" ---+---+---+---+---+---+---\n");
-    printf("  %c | %c | %c | %c | %c | %c | %c \n",board[6][0],board[6][1],board[6][2],board[6][3],board[6][4], board[6][5],board[6][6]);
-    
+    system("cls");
+    printf("\n\n\tTic Tac Toe\n\n");
+    printf("Player 1 (X) -- Player 2 (O)\n\n");
+    printf(" _________________________________________\n");
+    printf("|     |     |     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[0][0],board[0][1],board[0][2],board[0][3],board[0][4], board[0][5],board[0][6]);
+    printf("|_____|_____|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[1][0],board[1][1],board[1][2],board[1][3],board[1][4], board[1][5],board[1][6]);
+    printf("|_____|_____|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[2][0],board[2][1],board[2][2],board[2][3],board[2][4], board[2][5],board[2][6]);
+    printf("|_____|_____|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[3][0],board[3][1],board[3][2],board[3][3],board[3][4], board[3][5],board[3][6]);
+    printf("|_____|_____|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[4][0],board[4][1],board[4][2],board[4][3],board[4][4], board[4][5],board[4][6]);
+    printf("|_____|_____|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[5][0],board[5][1],board[5][2],board[5][3],board[5][4], board[5][5],board[5][6]);
+    printf("|_____|_____|_____|_____|_____|_____|_____|\n");
+    printf("|     |     |     |     |     |     |     |\n");
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[6][0],board[6][1],board[6][2],board[6][3],board[6][4], board[6][5],board[6][6]);
+    printf("|_____|_____|_____|_____|_____|_____|_____|\n");
     printf("\n\n");
 }
 
