@@ -21,11 +21,24 @@ typedef struct
 /* =====================================*/
 /*				Deklarasi Modul			*/
 /* =====================================*/
+
+/* Modul Tampilan */
+void MainMenuUI();
+void HighscoreUI();
+void GameModeUI();
+void HelpUI();
+void InputNameUI();
+void ChooseBoardUI();
+void GameOverUI();
 void Draw3x3Board(char**);
 void Draw5x5Board(char**);
 void Draw7x7Board(char**);
 void DrawBoard(char **board, int boardSize);
 
+/* Modul Logika */
+void MainMenu(int *choice);
+void GameMode(int *gameMode);
+void ChooseBoard(int *boardSize);
 char** CreateBoard(int boardSize);
 int StreakRule(int boardSize);
 int CheckHorizontal(char **board, int boardSize);
@@ -39,6 +52,7 @@ void GetComputerInput(MoveFormat *computerMove, int *currentPlayer);
 int isValidInput(char **board, MoveFormat *playerMove, int BoardSize);
 void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer);
 void InputName(PlayerName *playerName);
+void DeleteBoard(char **board, int boardSize);
 
 /* =====================================*/
 /*				Modul Utama				*/
@@ -47,52 +61,85 @@ void InputName(PlayerName *playerName);
 
 int main()
 {
-	char **board;
-	int gameMode = 1;
-	int boardSize = 3, col, row, currentPlayer = 1, isWin = 0, maxRound, roundPlayed = 0;
+	/* App Variabel */
+	int choice, gameMode = 1;
 	PlayerName playerName;
+	int gameOver = 0;
+	
+	/* Game Variabel */
+	char **board;
+	int boardSize = 3, col, row, currentPlayer = 1, isWin = 0, maxRound, roundPlayed = 0;
 	
 	/* Time variabel */
 	clock_t elapsedTime, timer;
 	int timeConsume;
 	
-	board = CreateBoard(boardSize);
-	maxRound = boardSize * boardSize;
-	
-	InputName(&playerName);
-	
-	// Game Start
-	elapsedTime = clock();
-	while(roundPlayed != maxRound)
+	while(gameOver == 0)
 	{
+		/* Halaman Menu */
+		MainMenu(&choice);
+		
+		GameMode(&gameMode);
+		
+		/* Clear \n after scanf */
+		while ( (choice = getchar()) != '\n' && choice != EOF );
+		
+		InputNameUI();
+		InputName(&playerName);
+		
+		ChooseBoard(&boardSize);
+		
+		board = CreateBoard(boardSize);
+		maxRound = boardSize * boardSize;
+		
+		
+		
+		// Game Start
+		elapsedTime = clock();
+		while(roundPlayed != maxRound)
+		{
+			DrawBoard(board, boardSize);
+			isWin = CheckWin(board, boardSize);
+			if(isWin > 0)
+				break;
+			MakeMove(board, boardSize, &currentPlayer, gameMode);
+			roundPlayed++;
+		}
+		
+		elapsedTime = clock() - elapsedTime;
+		timeConsume = elapsedTime / (CLOCKS_PER_SEC);
+		// Game End
+		
+		/*
 		DrawBoard(board, boardSize);
-		isWin = CheckWin(board, boardSize);
-		if(isWin > 0)
-			break;
-		MakeMove(board, boardSize, &currentPlayer, gameMode);
-		roundPlayed++;
+		if(isWin == 0)
+			printf("there is no winner\n");
+		else
+		{
+			if(currentPlayer == 2)
+			{	
+				printf("winner is player 1 : %s\n", playerName.NameP1);
+				printf("with time to complete : %d", timeConsume);	
+			}
+			else if(currentPlayer == 1)
+			{	
+				printf("winner is player 2 : %s\n", playerName.NameP2);
+				printf("with time to complete : %d", timeConsume);	
+			}
+		}
+		*/
+		
+		GameOverUI();
+		scanf("%d", &choice);
+		switch(choice)
+		{
+			case 1: exit(0); break;
+			case 2: break;
+		}
+		
+		DeleteBoard(board, boardSize);
 	}
 	
-	elapsedTime = clock() - elapsedTime;
-	timeConsume = elapsedTime / (CLOCKS_PER_SEC);
-	// Game End
-	
-	DrawBoard(board, boardSize);
-	if(isWin == 0)
-		printf("there is no winner\n");
-	else
-	{
-		if(currentPlayer == 2)
-		{	
-			printf("winner is player 1 : %s\n", playerName.NameP1);
-			printf("with time to complete : %d", timeConsume);	
-		}
-		else if(currentPlayer == 1)
-		{	
-			printf("winner is player 2 : %s\n", playerName.NameP2);
-			printf("with time to complete : %d", timeConsume);	
-		}
-	}
 	
 	return 0;
 }
@@ -103,6 +150,156 @@ int main()
 // Dibawah ini merupakan kumpulan modul-modul untuk mengurus bagian tampilan
 
 /* Modul untuk membuat tampilan papan 3x3 */
+
+void MainMenuUI()
+{
+	system("CLS");
+	printf("\t      <<==========>>\n");
+	printf("\t|====               ====|\n");
+	printf("\t|      TIC TAC TOE      |\n");
+	printf("\t|====               ====|\n");
+	printf("\t      <<== Lite ==>>\n\n");
+	
+	printf("       =============================\n");
+	printf("      ||Press '1' To Play The Game ||\n");
+	printf("      ||Press '2' To Look Highscore||\n");
+	printf("      ||Press '3' To Exit The Game ||\n");
+    printf("      ||Press '4' To Help          ||\n");
+    printf("       =============================\n");
+	printf("\nYour Choice : ");
+}
+
+void HighscoreUI()
+{
+	system("CLS");
+	printf("\t      <<==========>>\n");
+	printf("\t|====               ====|\n");
+	printf("\t|       HIGHSCORE       |\n");
+	printf("\t|====               ====|\n");
+	printf("\t      <<== User ==>>\n\n");
+	printf("John : 5 Minutes to clear\n\n");
+	printf("enter any key to go back : ");
+	getch();
+}
+
+void GameModeUI()
+{
+	system("CLS");
+	printf("\t      <<============>>\n");
+	printf("\t|====                 ====|\n");
+	printf("\t|        Game Mode        |\n");
+	printf("\t|====                 ====|\n");
+	printf("\t      <<== Choose ==>>\n\n");
+	
+	printf("       ============================\n");
+	printf("      ||[1] For Player Vs Player  ||\n");
+	printf("      ||[2] For Player Vs Computer||\n");
+	printf("       ============================\n");
+	printf("\nYour Choice : ");
+}
+
+void HelpUI()
+{
+	system("CLS");
+	printf("\t     <<============>>\n");
+	printf("\t|====                ====|\n");
+	printf("\t|          Help          |\n");
+	printf("\t|====                ====|\n");
+	printf("\t      <<== Choose ==>>\n\n");
+
+	printf("       =========================================================================================\n");
+	printf("      ||Di dalam game ini terdapat 2 Pemain Yaitu X dan O.                                     ||\n");
+	printf("      ||Cara mainnya adalah setiap pemain meletakkan nilai X atau O pada 9 kolom yang tersedia.||\n");
+	printf("       =========================================================================================\n");
+
+	printf("       ================================\n");
+	printf("      ||Press '1' To Next\n           ||");
+	printf("      ||Press '2' To Back to main menu||\n");
+	printf("       ================================\n");
+	printf("\nYour Choice : ");
+	
+	system("CLS");
+	printf("\t     <<============>>\n");
+	printf("\t|====                ====|\n");
+	printf("\t|          Help          |\n");
+	printf("\t|====                ====|\n");
+	printf("\t      <<== Choose ==>>\n\n");
+
+	printf("       ===========================================================\n");
+	printf("      ||Ketika index untuk meletakkan X atau O (ex: 1, 3, atau 5)||");
+	printf("       ===========================================================\n");
+
+	printf("       ================================\n");
+	printf("      ||Press '1' To Next             ||\n");
+	printf("      ||Press '2' To Previous         ||\n");
+	printf("      ||Press '3' To Back to main menu||\n");
+	printf("       ================================\n");
+	printf("\nYour Choice : ");
+	system("CLS");
+	printf("\t     <<============>>\n");
+	printf("\t|====                ====|\n");
+	printf("\t|          Help          |\n");
+	printf("\t|====                ====|\n");
+	printf("\t      <<== Choose ==>>\n\n");
+
+	printf("       =====================================================================================================================\n");
+	printf("      ||Untuk memenangkan permainan kamu harus dapat membentuk nilai X atau O berbentuk vertikal, horizontal, atau diagonal||");
+	printf("       =====================================================================================================================\n");
+	
+	printf("       ================================\n");
+	printf("      ||Press '1' To Previous         ||\n");
+	printf("      ||Press '2' To Back to main menu||\n");
+	printf("       ================================\n");
+	printf("\nYour Choice : ");
+}
+
+void InputNameUI()
+{
+	system("CLS");
+	printf("\t     <<=================>>\n");
+	printf("\t|====                      ====|\n");
+	printf("\t|      Game Configuration      |\n");
+	printf("\t|====                      ====|\n");
+	printf("\t      <<== Only 8 char ==>>\n\n");
+}
+
+void ChooseBoardUI()
+{
+	system("CLS");
+	printf("\t        <<============>>\n");
+	printf("\t|====                     ====|\n");
+	printf("\t|      Choose Board Size      |\n");
+	printf("\t|====                     ====|\n");
+	printf("\t         <<== Choose ==>>\n\n");
+	
+	printf("            ========================\n");
+	printf("           ||Press '3' For 3x3 Size||\n");
+	printf("           ||Press '5' For 5x5 Size||\n");
+	printf("           ||Press '7' For 7x7 Size||\n");
+	printf("            ========================\n");
+	printf("\nYour Choice : ");
+}
+
+void GameOverUI()
+{
+	system("CLS");
+	printf("\t      <<============>>\n");
+	printf("\t|====                  ====|\n");
+	printf("\t|      Congratulation      |\n");
+	printf("\t|====                  ====|\n");
+	printf("\t       <<== Winner ==>>\n\n");
+	
+	printf("       ===============================\n");
+	printf("      ||      Player 1 You Win       ||\n");
+	printf("       ===============================\n");
+	
+	printf("       ================================\n");
+	printf("      ||Press '1' To Exit             ||\n");
+	printf("      ||Press '2' To Back to main menu||\n");
+	printf("       ================================\n");
+	printf("\nYour Choice : ");
+}
+
 void Draw3x3Board(char**board)
 {
     system("cls");
@@ -192,6 +389,53 @@ void DrawBoard(char **board, int boardSize)
 /*				Modul Logika			*/
 /* =====================================*/
 // dibawah ini merupakan kumpulan modul-modul untuk mengurus logika program
+
+void MainMenu(int *choice)
+{
+	do
+	{
+		MainMenuUI();
+		scanf("%d", choice);
+		switch(*choice)
+		{
+			case 1: break;
+			case 2: HighscoreUI(); break;
+			case 3: exit(0); break;
+			case 4: HelpUI();
+		}
+	}while(*choice != 1);
+}
+
+void GameMode(int *gameMode)
+{
+	do
+	{
+		GameModeUI();
+		scanf("%d", gameMode);
+		switch(*gameMode)
+		{
+			case 1: *gameMode = 1; break;
+			case 2: *gameMode = 2; break;
+			default: *gameMode = 0; break;
+		}
+	}while(*gameMode == 0);
+}
+
+void ChooseBoard(int *boardSize)
+{
+	do
+	{
+		ChooseBoardUI();
+		scanf("%d", boardSize);
+		switch(*boardSize)
+		{
+			case 3: *boardSize = 3; break;
+			case 5: *boardSize = 5; break;
+			case 7: *boardSize = 7; break;
+			default: *boardSize = 0; break;
+		}
+	}while(*boardSize == 0);
+}
 
 /* Ini adalah modul untuk membuat papan permainan */
 char** CreateBoard(int boardSize)
@@ -398,7 +642,7 @@ void GetComputerInput(MoveFormat *computerMove, int *currentPlayer)
 
 int isValidInput(char **board, MoveFormat *playerMove, int boardSize)
 {
-	if((playerMove->row < 0 || playerMove->row >= boardSize ) && (playerMove->col < 0 || playerMove->col >= boardSize))
+	if((playerMove->row < 0 || playerMove->row >= boardSize ) || (playerMove->col < 0 || playerMove->col >= boardSize))
 		return 0;
 	else
 	{
@@ -435,5 +679,12 @@ void InputName(PlayerName *playerName)
 	fgets(playerName->NameP2, 12, stdin);
 }
 
-
+/* Dealocate memory from board */
+void DeleteBoard(char **board, int boardSize)
+{
+	int i;
+	for(i = 0; i < boardSize; i++)
+		free(board[i]);
+	free(board);
+}
 
