@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 /* =====================================*/
 /*				UDT						*/
@@ -29,7 +30,8 @@ void GameModeUI();
 void HelpUI();
 void InputNameUI();
 void ChooseBoardUI();
-void GameOverUI();
+void WinnerUI(char winner[], int timeConsume);
+void TieUI();
 void Draw3x3Board(char**);
 void Draw5x5Board(char**);
 void Draw7x7Board(char**);
@@ -39,6 +41,7 @@ void DrawBoard(char **board, int boardSize);
 void MainMenu(int *choice);
 void GameMode(int *gameMode);
 void ChooseBoard(int *boardSize);
+void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume);
 char** CreateBoard(int boardSize);
 int StreakRule(int boardSize);
 int CheckHorizontal(char **board, int boardSize);
@@ -48,11 +51,12 @@ int CheckSecDiagonal(char **board, int boardSize);
 int CheckWin(char **board, int boardSize);
 void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode);
 void GetUserInput(char **board, MoveFormat *playerMove,  int *currentPlayer, int boardSize);
-void GetComputerInput(MoveFormat *computerMove, int *currentPlayer);
+void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize);
 int isValidInput(char **board, MoveFormat *playerMove, int BoardSize);
 void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer);
 void InputName(PlayerName *playerName);
 void DeleteBoard(char **board, int boardSize);
+
 
 /* =====================================*/
 /*				Modul Utama				*/
@@ -69,6 +73,7 @@ int main()
 	/* Game Variabel */
 	char **board;
 	int boardSize = 3, col, row, currentPlayer = 1, isWin = 0, maxRound, roundPlayed = 0;
+	char winner[12];
 	
 	/* Time variabel */
 	clock_t elapsedTime, timer;
@@ -76,6 +81,8 @@ int main()
 	
 	while(gameOver == 0)
 	{
+		currentPlayer = 1;
+		roundPlayed = 0;
 		/* Halaman Menu */
 		MainMenu(&choice);
 		
@@ -84,7 +91,6 @@ int main()
 		/* Clear \n after scanf */
 		while ( (choice = getchar()) != '\n' && choice != EOF );
 		
-		InputNameUI();
 		InputName(&playerName);
 		
 		ChooseBoard(&boardSize);
@@ -108,28 +114,12 @@ int main()
 		
 		elapsedTime = clock() - elapsedTime;
 		timeConsume = elapsedTime / (CLOCKS_PER_SEC);
-		// Game End
 		
-		/*
 		DrawBoard(board, boardSize);
-		if(isWin == 0)
-			printf("there is no winner\n");
-		else
-		{
-			if(currentPlayer == 2)
-			{	
-				printf("winner is player 1 : %s\n", playerName.NameP1);
-				printf("with time to complete : %d", timeConsume);	
-			}
-			else if(currentPlayer == 1)
-			{	
-				printf("winner is player 2 : %s\n", playerName.NameP2);
-				printf("with time to complete : %d", timeConsume);	
-			}
-		}
-		*/
+		printf("Game Over, press any key to continue : ");getch();
 		
-		GameOverUI();
+		
+		GameOver(currentPlayer, playerName, roundPlayed, maxRound, timeConsume);
 		scanf("%d", &choice);
 		switch(choice)
 		{
@@ -280,18 +270,38 @@ void ChooseBoardUI()
 	printf("\nYour Choice : ");
 }
 
-void GameOverUI()
+void WinnerUI(char winner[], int timeConsume)
 {
 	system("CLS");
 	printf("\t      <<============>>\n");
 	printf("\t|====                  ====|\n");
-	printf("\t|      Congratulation      |\n");
+	printf("\t|         Gameover         |\n");
 	printf("\t|====                  ====|\n");
-	printf("\t       <<== Winner ==>>\n\n");
+	printf("\t      <<== winner ==>>\n\n");
 	
-	printf("       ===============================\n");
-	printf("      ||      Player 1 You Win       ||\n");
-	printf("       ===============================\n");
+	printf("       =============================================================\n");
+	printf("           %s Memenangkan permainan dengan waktu %d detik ++>\n", winner, timeConsume);
+	printf("       =============================================================\n");
+	
+	printf("       ================================\n");
+	printf("      ||Press '1' To Exit             ||\n");
+	printf("      ||Press '2' To Back to main menu||\n");
+	printf("       ================================\n");
+	printf("\nYour Choice : ");
+}
+
+void TieUI()
+{
+	system("CLS");
+	printf("\t      <<============>>\n");
+	printf("\t|====                  ====|\n");
+	printf("\t|         Gameover         |\n");
+	printf("\t|====                  ====|\n");
+	printf("\t      <<==   Tie   ==>>\n\n");
+	
+	printf("       =========================       \n");
+	printf("           Tidak ada pemenang		   \n");
+	printf("       =========================       \n");
 	
 	printf("       ================================\n");
 	printf("      ||Press '1' To Exit             ||\n");
@@ -437,6 +447,21 @@ void ChooseBoard(int *boardSize)
 	}while(*boardSize == 0);
 }
 
+void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume)
+{
+	char winner[12];
+	if(roundPlayed != maxRound)
+	{
+		if(currentPlayer == 1)
+			strcpy(winner, playerName.NameP2);
+		else if(currentPlayer == 2)
+			strcpy(winner, playerName.NameP1);
+		
+		WinnerUI(winner, timeConsume);
+	}else if(roundPlayed == maxRound)
+		TieUI();
+}
+
 /* Ini adalah modul untuk membuat papan permainan */
 char** CreateBoard(int boardSize)
 {
@@ -532,7 +557,8 @@ int CheckVertical(char **board, int boardSize)
 /* Memeriksa kemengangan di diagonal Utama */
 int CheckMainDiagonal(char **board, int boardSize)
 {
-	int i, j, count = 0;
+	int i, j, count = 0, diagonalNum = 1;
+	/*Check Secondary 0*/
 	for(i = 1; i < boardSize; i++)
 	{
 		for(j = 1; j < boardSize; j++)
@@ -554,7 +580,99 @@ int CheckMainDiagonal(char **board, int boardSize)
 	else
 		count = 0;
 	
-	/* jika tidak ada yang sama, belum ada pemenang */
+	if(boardSize == 3)
+		return 0;
+	
+	/* Check secondary diagonal +1 */
+	for(i = 0; i < boardSize - 2; i++)
+	{
+		for(j = 0; j < boardSize - 2; j++)
+		{
+			if(i == j)
+			{
+				if(board[i][j+1] != ' ')
+				{
+					if(board[i][j + 1] == board[i + 1][j + 2])
+						count++;
+				}
+				
+			}
+		}
+	}
+	
+	if(count >= StreakRule(boardSize))
+		return 1;
+	else
+		count = 0;
+		
+	/* Check Secondary Diagonal -1 */
+	for(i = 0; i < boardSize - 2; i++)
+	{
+		for(j = 0; j < boardSize - 2; j++)
+		{
+			if(i == j)
+			{
+				if(board[i+1][j] != ' ')
+				{
+					if(board[i+1][j] == board[i + 2][j + 1])
+						count++;
+				}
+			}
+		}
+	}
+	
+	if(count >= StreakRule(boardSize))
+		return 1;
+	else
+		count = 0;
+	
+	if(boardSize == 5)
+		return 0;
+	
+	/* Check Secondary Diagonal +2 */
+	for(i = 0; i < boardSize - 3; i++)
+	{
+		for(j = 0; j < boardSize - 3; j++)
+		{
+			if(i == j)
+			{
+				if(board[i][j+2] != ' ')
+				{
+					if(board[i][j + 2] == board[i + 1][j + 3])
+						count++;
+				}
+				
+			}
+		}
+	}
+	
+	if(count >= StreakRule(boardSize))
+		return 1;
+	else
+		count = 0;
+	
+	/* Check Secondary Diagonal -2 */
+	for(i = 0; i < boardSize - 3; i++)
+	{
+		for(j = 0; j < boardSize - 3; j++)
+		{
+			if(i == j)
+			{
+				if(board[i+2][j] != ' ')
+				{
+					if(board[i+2][j] == board[i + 3][j + 1])
+						count++;
+				}
+				
+			}
+		}
+	}
+	
+	if(count >= StreakRule(boardSize))
+		return 1;
+	else
+		count = 0;
+	
 	return 0;
 }
 
@@ -577,6 +695,102 @@ int CheckSecDiagonal(char **board, int boardSize)
 		}
 	}
 	
+	/* check streak */
+	if(count >= StreakRule(boardSize))
+		return 1;
+	else
+		count = 0;
+	
+	/* Check Secondary Diagonal + 1 */
+	for(i = 0; i < boardSize - 2; i++)
+	{
+		for(j = 0; j < boardSize; j++)
+		{
+			/* cek apakah sedang dalam kotak diagonal sekunder */
+			if(i + j == boardSize - 1)
+			{
+				if(board[i][j - 1] != ' ')
+				{
+					/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
+					if(board[i][j - 1] == board[i+1][j-2])
+						count++;
+				}
+				
+			}
+		}
+	}
+	/* check streak */
+	if(count >= StreakRule(boardSize))
+		return 1;
+	else
+		count = 0;
+	
+	/* Check Secondary Diagonal - 1 */
+	for(i = 0; i < boardSize - 2; i++)
+	{
+		for(j = 0; j < boardSize; j++)
+		{
+			/* cek apakah sedang dalam kotak diagonal sekunder */
+			if(i + j == boardSize - 1)
+			{
+				if(board[i + 1][j] != ' ')
+				{
+					/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
+					if(board[i+1][j] == board[i+2][j-1])
+						count++;
+				}
+				
+			}
+		}
+	}
+	/* check streak */
+	if(count >= StreakRule(boardSize))
+		return 1;
+	else
+		count = 0;
+	
+	/* Check Secondary Diagonal + 2 */
+	for(i = 0; i < boardSize - 3; i++)
+	{
+		for(j = 0; j < boardSize; j++)
+		{
+			/* cek apakah sedang dalam kotak diagonal sekunder */
+			if(i + j == boardSize - 1)
+			{
+				if(board[i][j - 2] != ' ')
+				{
+					/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
+					if(board[i][j - 2] == board[i+1][j-3])
+						count++;
+				}
+				
+			}
+		}
+	}
+	/* check streak */
+	if(count >= StreakRule(boardSize))
+		return 1;
+	else
+		count = 0;
+		
+	/* Check Secondary Diagonal - 2 */
+	for(i = 0; i < boardSize - 3; i++)
+	{
+		for(j = 0; j < boardSize; j++)
+		{
+			/* cek apakah sedang dalam kotak diagonal sekunder */
+			if(i + j == boardSize - 1)
+			{
+				if(board[i+2][j] != ' ')
+				{
+					/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
+					if(board[i+2][j] == board[i+3][j-1])
+						count++;
+				}
+				
+			}
+		}
+	}
 	/* check streak */
 	if(count >= StreakRule(boardSize))
 		return 1;
@@ -611,7 +825,7 @@ void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode)
 		if(*currentPlayer == 1)
 			GetUserInput(board, &Move, currentPlayer, boardSize);
 		else if(*currentPlayer == 2)
-			GetComputerInput(&Move, currentPlayer);	
+			GetComputerInput(board, &Move, currentPlayer, boardSize);	
 	}
 	
 	/* Fill to Board */
@@ -635,8 +849,35 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 	}while(isValid == 0);
 }
 
-void GetComputerInput(MoveFormat *computerMove, int *currentPlayer)
-{
+void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize)
+{	
+	int row, col;
+	int moveAvailable[boardSize*boardSize][2];
+	int currentIdx = 0;
+	int randMove;
+	
+	// check kotak kosong tersedia
+	for(row = 0; row < boardSize; row++)
+	{
+		for(col = 0; col < boardSize; col++)
+		{
+			if(board[row][col] == ' ')
+			{
+				// kumpulkan kotak tersedia
+				moveAvailable[currentIdx][0] = row;
+				moveAvailable[currentIdx][1] = col;
+				currentIdx++;
+			}
+		}
+	}
+	
+	srand(time(NULL));
+	// Memilih secara acak kotak yang ingin di isi dari kotak kosong yang tersedia
+	randMove = rand() % currentIdx;
+	
+	// mengisi kotak kosong dengan langkah yang telah di generate
+	computerMove->row = moveAvailable[randMove][0];
+	computerMove->col = moveAvailable[randMove][1];
 	
 }
 
@@ -673,10 +914,11 @@ void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer)
 
 void InputName(PlayerName *playerName)
 {
-	printf("Input Player 1 Name : ");
-	fgets(playerName->NameP1, 12, stdin);
-	printf("Input Player 2 Name  : ");
-	fgets(playerName->NameP2, 12, stdin);
+	InputNameUI();
+	printf("Input Player 1 Name : ");scanf("%s", &playerName->NameP1);
+	//fgets(playerName->NameP1, 12, stdin);
+	printf("Input Player 2 Name  : ");scanf("%s", &playerName->NameP2);
+	//fgets(playerName->NameP2, 12, stdin);
 }
 
 /* Dealocate memory from board */
