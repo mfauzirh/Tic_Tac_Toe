@@ -929,4 +929,3 @@ void DeleteBoard(char **board, int boardSize)
 		free(board[i]);
 	free(board);
 }
-
