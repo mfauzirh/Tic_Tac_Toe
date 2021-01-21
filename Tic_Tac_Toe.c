@@ -39,14 +39,14 @@ void Draw7x7Board(char**);
 void DrawBoard(char **board, int boardSize);
 
 /* Modul Logika */
-void MainMenu(int *choice);
+void MainMenu();
 void GameMode(int *gameMode);
 void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
 void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume);
 char** CreateBoard(int boardSize);
 int StreakRule(int boardSize);
-int CheckStreak(char temp[], int boardSize);
+int CheckStreak(char temp[], int boardSize, int numStreak);
 int CheckHorizontal(char **board, int boardSize);
 int CheckVertical(char **board, int boardSize);
 int CheckMainDiagonal(char **board, int boardSize);
@@ -70,46 +70,46 @@ void DeleteBoard(char **board, int boardSize);
 
 int main()
 {
-	/* App Variabel */
-	int choice, gameMode = 1;
-	PlayerName playerName;
-	int gameOver = 0;
-	
-	/* Game Variabel */
+	// Deklarasi
 	char **board;
-	int boardSize = 3, col, row, currentPlayer = 1, isWin = 0, maxRound, roundPlayed = 0, opponent = 2;
-	char winner[12];
+	int boardSize, currentPlayer, isWin, maxRound, roundPlayed, opponent, gameMode, isExit, timeConsume;
+	PlayerName playerName;
+	clock_t elapsedTime;
 	
-	/* Time variabel */
-	clock_t elapsedTime, timer;
-	int timeConsume;
-	
-	while(gameOver == 0)
+	isExit = 0;
+	while(isExit == 0)
 	{
+		// Inisialisasi
 		currentPlayer = 1;
 		roundPlayed = 0;
-		/* Halaman Menu */
-		MainMenu(&choice);
+		isWin = 0;
 		
+		// Menampilkan main menu
+		MainMenu();
+		
+		//Menampilkan pilihan mode permainan
 		GameMode(&gameMode);
 		
+		// Jika memilih Vs Computer maka tampilkan pilihan lawan bermain
 		if(gameMode == 2)
 			ChooseOpponent(&opponent);
 		
-		/* Clear \n after scanf */
-		//while ( (choice = getchar()) != '\n' && choice != EOF );
-		
+		// Menginputkan nama pemain
 		InputName(&playerName);
 		
+		// Memilih ukuran papan permainan
 		ChooseBoard(&boardSize);
 		
+		// Membuat papan permainan
 		board = CreateBoard(boardSize);
+		
+		// Menentukan ronde maksimal
 		maxRound = boardSize * boardSize;
 		
-		
-		
-		// Game Start
+		// Menjalankan Stopwatch
 		elapsedTime = clock();
+		
+		// --- Game Start ---
 		while(roundPlayed != maxRound)
 		{
 			DrawBoard(board, boardSize);
@@ -119,25 +119,22 @@ int main()
 			MakeMove(board, boardSize, &currentPlayer, gameMode, opponent);
 			roundPlayed++;
 		}
+		// --- Game Over ---
 		
+		// Memberhentikan stopwatch
 		elapsedTime = clock() - elapsedTime;
 		timeConsume = elapsedTime / (CLOCKS_PER_SEC);
 		
+		// Menampilkan keadaan akhir papan permainan
 		DrawBoard(board, boardSize);
 		printf("Game Over, press any key to continue : ");getch();
 		
-		
+		// Menampilkan tampilan Game Over
 		GameOver(currentPlayer, playerName, roundPlayed, maxRound, timeConsume);
-		scanf("%d", &choice);
-		switch(choice)
-		{
-			case 1: exit(0); break;
-			case 2: break;
-		}
 		
+		// Menghapus papan saat ini
 		DeleteBoard(board, boardSize);
 	}
-	
 	
 	return 0;
 }
@@ -427,20 +424,21 @@ void DrawBoard(char **board, int boardSize)
 /* =====================================*/
 // dibawah ini merupakan kumpulan modul-modul untuk mengurus logika program
 
-void MainMenu(int *choice)
+void MainMenu()
 {
+	int choice;
 	do
 	{
 		MainMenuUI();
-		scanf("%d", choice);
-		switch(*choice)
+		scanf("%d", &choice);
+		switch(choice)
 		{
 			case 1: break;
 			case 2: HighscoreUI(); break;
 			case 3: exit(0); break;
 			case 4: HelpUI();
 		}
-	}while(*choice != 1);
+	}while(choice != 1);
 }
 
 void GameMode(int *gameMode)
@@ -466,6 +464,7 @@ void ChooseOpponent(int *opponent)
 		scanf("%d", opponent);
 	}while(*opponent != 1 && *opponent != 2);
 }
+
 void ChooseBoard(int *boardSize)
 {
 	do
@@ -485,6 +484,8 @@ void ChooseBoard(int *boardSize)
 void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume)
 {
 	char winner[12];
+	int choice;
+	int isWin;
 	if(roundPlayed != maxRound)
 	{
 		if(currentPlayer == 1)
@@ -492,9 +493,23 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 		else if(currentPlayer == 2)
 			strcpy(winner, playerName.NameP1);
 		
-		WinnerUI(winner, timeConsume);
+		isWin = 1;
 	}else if(roundPlayed == maxRound)
-		TieUI();
+		isWin = 0;
+	
+	do
+	{
+		if(isWin == 1)
+			WinnerUI(winner, timeConsume);
+		else if(isWin == 0)
+			TieUI();
+			
+		scanf("%d", &choice);
+		if(choice == 1)
+			exit(0);
+		else if(choice == 2)
+			break;
+	}while(choice != 1 && choice != 2);
 }
 
 /* Ini adalah modul untuk membuat papan permainan */
@@ -525,31 +540,82 @@ int StreakRule(int boardSize)
 	if(boardSize == 3)
 		numberToStreak = boardSize - 1;
 	else if(boardSize == 5)
-		numberToStreak = boardSize - 2;
+		numberToStreak = boardSize - 1;
 	else if(boardSize == 7)
-		numberToStreak = boardSize - 3;
+		numberToStreak = boardSize - 2;
 	
 	return numberToStreak;
 }
 
-int CheckStreak(char board[], int boardSize)
+int CheckStreak(char board[], int lineSize, int numStreak)
 {
-	if(boardSize == 5) // 
+	// Modul CheckStreak berfungsi untuk men-cek pola streak 
+	// lineSize adalah jumlah kotak yang tersedia
+	// numStreak adalah jumlah total simbol yang membentuk pola kemenangan
+	
+	if(lineSize == 3) // Check semua kemungkinan pola menang di papan berisi 3 kotak
 	{
-		// Check semua kemungkinan pola menang
-		// Pola Streak  : _XXXX OR XXXX_
+		// jumlah streak 3
+		// Kemungkinan Pola Streak : XXX
 		if
 		(
-			(board[0] == board[1] && board[1] == board[2] && board[2] == board[3]) ||
-			(board[1] == board[2] && board[2] == board[3] && board[3] == board[4])	
+			(board[0] == board[1] && board[1] == board[2])	
 		)
 		{
-			if(board[2] == 'X' || board[2] == 'O')
+			if(board[1] == 'X' || board[1] == 'O') 
 				return 1;
 		}
-	}else if(boardSize == 7)
+	}else if(lineSize == 4) // Check semua kemungkinan pola menang di papan berisi 4 kotak
 	{
-		// Check semua kemungkinan pola menang
+		// jumlah streak 4
+		// Kemungkinan Pola Streak : XXXX
+		if(board[0] == board[1] && board[1] == board[2] && board[2] == board[3])
+		{
+			if(board[1] == 'X' || board[1] == 'O')
+				return 1;
+		}
+		
+	}else if(lineSize == 5) 
+	{
+		// Check semua kemungkinan pola menang di papan berisi 5 kotak
+		if(numStreak == 4) // jumlah streak 4
+		{
+			// Pola Streak  : _XXXX OR XXXX_ OR XXXXX
+			if
+			(
+				(board[0] == board[1] && board[1] == board[2] && board[2] == board[3]) ||
+				(board[1] == board[2] && board[2] == board[3] && board[3] == board[4])	
+			)
+			{
+				if(board[2] == 'X' || board[2] == 'O')
+					return 1;
+			}
+		}else if(numStreak == 5) // jumlah streak 5
+		{
+			// Pola Streak  : XXXXX
+			if(board[0] == board[1] && board[1] == board[2] && board[2] == board[3] && board[3] == board[4])
+			{
+				if(board[2] == 'X' || board[2] == 'O')
+					return 1;
+			}
+		}
+		
+	}else if(lineSize == 6) // Check semua kemungkinan pola menang di papan berisi 6 kotak
+	{
+		// jumlah streak 5
+		// pola Streak : _XXXXX OR XXXXX_
+		if
+		(
+			(board[0] == board[1] && board[1] == board[2] && board[2] == board[3] && board[3] == board[4]) ||
+			(board[1] == board[2] && board[2] == board[3] && board[3] == board[4] && board[4] == board[5])	
+		)
+		{
+			if(board[3] == 'X' || board[3] == 'O')
+				return 1;
+		}
+	}else if(lineSize == 7)// Check semua kemungkinan pola menang di papan dengan berisi 7 kotak
+	{
+		// jumlah streak 5
 		// pola Streak : __XXXXX OR _XXXXX_ OR XXXXX__
 		if
 		(
@@ -558,7 +624,7 @@ int CheckStreak(char board[], int boardSize)
 			(board[1] == board[2] && board[2] == board[3] && board[3] == board[4] && board[4] == board[5])	
 		)
 		{
-			if(board[2] == 'X' || board[2] == 'O')
+			if(board[4] == 'X' || board[4] == 'O')
 				return 1;
 		}
 	}
@@ -575,312 +641,237 @@ int CheckHorizontal(char **board, int boardSize)
 		for(j = 0; j < boardSize; j++)
 			temp[j] = board[i][j];
 		
-		if(CheckStreak(temp, boardSize) == 1)
+		if(CheckStreak(temp, boardSize, StreakRule(boardSize)) == 1)
 		{
 			return 1;
 		}
 	}
 	
 	return 0;
-	
-	/*
-	int i, j, count = 0;
-	int numberToStreak = StreakRule(boardSize);
-	for(i = 0; i < boardSize; i++)
-	{
-		for(j = 1; j < boardSize; j++)
-		{
-			// memeriksa apakah kotak tidak kosong 
-			if(board[i][j-1] != ' ')
-			{
-				// memeriksa apakah kotak memiliki simbol yang samas 
-				if(board[i][j-1] == board[i][j])
-					count++;
-			}
-		}
-		
-		// jika simbol streak, maka menang 
-		if(count >= numberToStreak)
-			return 1;
-		else
-			count = 0;
-	}
-	// jika tidak ada yang sama, belum ada pemenang 
-	return 0;
-	*/
 }
-
 
 /* Modul untuk memeriksa kemenangan secara vertical */
 int CheckVertical(char **board, int boardSize)
 {
-	int i, j, count = 0;
-	int numberToStreak = StreakRule(boardSize);
+	char temp[boardSize];
+	int i, j;
+	
 	for(i = 0; i < boardSize; i++)
 	{
-		for(j = 1; j < boardSize; j++)
-		{
-			/* memeriksa apakah kotak tidak kosong */
-			if(board[j-1][i] != ' ')
-			{
-				/* memeriksa apakah kotak memiliki simbol yang samas*/
-				if(board[j-1][i] == board[j][i])
-					count++;
-			}
-		}
+		for(j = 0; j < boardSize; j++)
+			temp[j] = board[j][i];
 		
-		/* jika simbol streak, maka menang */
-		if(count >= numberToStreak)
+		if(CheckStreak(temp, boardSize, StreakRule(boardSize)) == 1)
+		{
 			return 1;
-		else
-			count = 0;
+		}
 	}
-	/* jika tidak ada yang sama, belum ada pemenang */
+	
 	return 0;
 }
 
 /* Memeriksa kemengangan di diagonal Utama */
 int CheckMainDiagonal(char **board, int boardSize)
 {
-	int i, j, count = 0, diagonalNum = 1;
-	/*Check Secondary 0*/
-	for(i = 1; i < boardSize; i++)
+	int i, j, k;
+	char temp[boardSize];
+	
+	// check main diagonal 0
+	k = 0;
+	for(i = 0; i < boardSize; i++)
 	{
-		for(j = 1; j < boardSize; j++)
+		for(j = 0; j < boardSize; j++)
 		{
-			/* cek apakah sedang dalam kotak diagonal */
-			if(i == j && board[i][j] != ' ')
+			if(i == j)
 			{
-				/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
-				if(board[i - 1][j - 1] == board[i][j])
-					count++;
+				temp[k] = board[i][j];
+				k++;
 			}
-			
 		}
-	}
+	}	
 	
-	/* check streak */
-	if(count >= StreakRule(boardSize))
+	if(CheckStreak(temp, boardSize, StreakRule(boardSize)) == 1)
 		return 1;
-	else
-		count = 0;
 	
+	// jika papan berukuran 3x3 tidak perlu lanjut
 	if(boardSize == 3)
 		return 0;
 	
-	/* Check secondary diagonal +1 */
-	for(i = 0; i < boardSize - 2; i++)
+	// Check main diagonal +1
+	k = 0;
+	for(i = 0; i < boardSize - 1; i++)
 	{
-		for(j = 0; j < boardSize - 2; j++)
+		for(j = 0; j < boardSize - 1; j++)
 		{
 			if(i == j)
 			{
-				if(board[i][j+1] != ' ')
-				{
-					if(board[i][j + 1] == board[i + 1][j + 2])
-						count++;
-				}
-				
+				temp[k] = board[i][j+1];
+				k++;
 			}
 		}
 	}
 	
-	if(count >= StreakRule(boardSize))
+	if(CheckStreak(temp, boardSize - 1, StreakRule(boardSize)) == 1)
 		return 1;
-	else
-		count = 0;
 		
-	/* Check Secondary Diagonal -1 */
-	for(i = 0; i < boardSize - 2; i++)
+	// Check main diagonal -1
+	k = 0;
+	for(i = 0; i < boardSize - 1; i++)
 	{
-		for(j = 0; j < boardSize - 2; j++)
+		for(j = 0; j < boardSize - 1; j++)
 		{
 			if(i == j)
 			{
-				if(board[i+1][j] != ' ')
-				{
-					if(board[i+1][j] == board[i + 2][j + 1])
-						count++;
-				}
+				temp[k] = board[i+1][j];
+				k++;
 			}
 		}
 	}
 	
-	if(count >= StreakRule(boardSize))
+	if(CheckStreak(temp, boardSize - 1, StreakRule(boardSize)) == 1)
 		return 1;
-	else
-		count = 0;
 	
+	// jika ukuran papan 5x5 tidak perlu lanjut
 	if(boardSize == 5)
 		return 0;
 	
-	/* Check Secondary Diagonal +2 */
-	for(i = 0; i < boardSize - 3; i++)
+	// Check main diagonal +2
+	k = 0;
+	for(i = 0; i < boardSize - 2; i++)
 	{
-		for(j = 0; j < boardSize - 3; j++)
+		for(j = 0; j < boardSize - 2; j++)
 		{
 			if(i == j)
 			{
-				if(board[i][j+2] != ' ')
-				{
-					if(board[i][j + 2] == board[i + 1][j + 3])
-						count++;
-				}
-				
+				temp[k] = board[i][j+2];
+				k++;
 			}
 		}
 	}
 	
-	if(count >= StreakRule(boardSize))
+	if(CheckStreak(temp, boardSize - 2, StreakRule(boardSize)) == 1)
 		return 1;
-	else
-		count = 0;
 	
-	/* Check Secondary Diagonal -2 */
-	for(i = 0; i < boardSize - 3; i++)
+	// Check main diagonal -2
+	k = 0;
+	for(i = 0; i < boardSize - 2; i++)
 	{
-		for(j = 0; j < boardSize - 3; j++)
+		for(j = 0; j < boardSize - 2; j++)
 		{
 			if(i == j)
 			{
-				if(board[i+2][j] != ' ')
-				{
-					if(board[i+2][j] == board[i + 3][j + 1])
-						count++;
-				}
-				
+				temp[k] = board[i+2][j];
+				k++;
 			}
 		}
 	}
 	
-	if(count >= StreakRule(boardSize))
+	if(CheckStreak(temp, boardSize - 2, StreakRule(boardSize)) == 1)
 		return 1;
-	else
-		count = 0;
-	
+		
 	return 0;
 }
 
 /* Memeriksa kemenangan di diagonal sekunder */
 int CheckSecDiagonal(char **board, int boardSize)
 {
-	int i, j, count = 0;
+	int i, j, k;
+	char temp[boardSize];
 	
-	for(i = 1; i < boardSize; i++)
+	// Check Secondary diagonal 0
+	k = 0;
+	for(i = 0; i < boardSize; i++)
 	{
 		for(j = 0; j < boardSize; j++)
 		{
-			/* cek apakah sedang dalam kotak diagonal sekunder */
-			if(i + j == boardSize - 1 && board[i][j] != ' ')
-			{
-				/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
-				if(board[i - 1][j + 1] == board[i][j])
-					count++;
-			}
-		}
-	}
-	
-	/* check streak */
-	if(count >= StreakRule(boardSize))
-		return 1;
-	else
-		count = 0;
-	
-	/* Check Secondary Diagonal + 1 */
-	for(i = 0; i < boardSize - 2; i++)
-	{
-		for(j = 0; j < boardSize; j++)
-		{
-			/* cek apakah sedang dalam kotak diagonal sekunder */
 			if(i + j == boardSize - 1)
 			{
-				if(board[i][j - 1] != ' ')
-				{
-					/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
-					if(board[i][j - 1] == board[i+1][j-2])
-						count++;
-				}
-				
+				temp[k] = board[i][j];
+				k++;
 			}
 		}
-	}
-	/* check streak */
-	if(count >= StreakRule(boardSize))
-		return 1;
-	else
-		count = 0;
+	}	
 	
-	/* Check Secondary Diagonal - 1 */
-	for(i = 0; i < boardSize - 2; i++)
+	if(CheckStreak(temp, boardSize, StreakRule(boardSize)) == 1)
+	{
+		return 1;
+	}
+	
+	// jika ukuran papan 3x3 tidak perlu lanjut
+	if(boardSize == 3)
+		return 0;
+	
+	// Check secondary diagonal +1
+	k = 0;
+	for(i = 0; i < boardSize - 1; i++)
 	{
 		for(j = 0; j < boardSize; j++)
 		{
-			/* cek apakah sedang dalam kotak diagonal sekunder */
 			if(i + j == boardSize - 1)
 			{
-				if(board[i + 1][j] != ' ')
-				{
-					/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
-					if(board[i+1][j] == board[i+2][j-1])
-						count++;
-				}
-				
+				temp[k] = board[i][j-1];
+				k++;
 			}
 		}
 	}
-	/* check streak */
-	if(count >= StreakRule(boardSize))
-		return 1;
-	else
-		count = 0;
 	
-	/* Check Secondary Diagonal + 2 */
-	for(i = 0; i < boardSize - 3; i++)
-	{
-		for(j = 0; j < boardSize; j++)
-		{
-			/* cek apakah sedang dalam kotak diagonal sekunder */
-			if(i + j == boardSize - 1)
-			{
-				if(board[i][j - 2] != ' ')
-				{
-					/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
-					if(board[i][j - 2] == board[i+1][j-3])
-						count++;
-				}
-				
-			}
-		}
-	}
-	/* check streak */
-	if(count >= StreakRule(boardSize))
+	if(CheckStreak(temp, boardSize - 1, StreakRule(boardSize)) == 1)
 		return 1;
-	else
-		count = 0;
 		
-	/* Check Secondary Diagonal - 2 */
-	for(i = 0; i < boardSize - 3; i++)
+	// Check secondary diagonal -1
+	k = 0;
+	for(i = 0; i < boardSize - 1; i++)
 	{
 		for(j = 0; j < boardSize; j++)
 		{
-			/* cek apakah sedang dalam kotak diagonal sekunder */
 			if(i + j == boardSize - 1)
 			{
-				if(board[i+2][j] != ' ')
-				{
-					/* cek apakah kotak diagonal sama dengan kotak diagonal sebelumnnya */
-					if(board[i+2][j] == board[i+3][j-1])
-						count++;
-				}
-				
+				temp[k] = board[i+1][j];
+				k++;
 			}
 		}
 	}
-	/* check streak */
-	if(count >= StreakRule(boardSize))
+	
+	if(CheckStreak(temp, boardSize - 1, StreakRule(boardSize)) == 1)
 		return 1;
-	else
-		count = 0;
+	
+	// jika ukuran papan 5x5 tidak perlu lanjut
+	if(boardSize == 5)
+		return 0;
+		
+	// Check secondary diagonal +2
+	k = 0;
+	for(i = 0; i < boardSize - 2; i++)
+	{
+		for(j = 0; j < boardSize; j++)
+		{
+			if(i + j == boardSize - 1)
+			{
+				temp[k] = board[i][j-2];
+				k++;
+			}
+		}
+	}
+	
+	if(CheckStreak(temp, boardSize - 2, StreakRule(boardSize)) == 1)
+		return 1;
+	
+	// Check secondary diagonal -2
+	k = 0;
+	for(i = 0; i < boardSize - 2; i++)
+	{
+		for(j = 0; j < boardSize; j++)
+		{
+			if(i + j == boardSize - 1)
+			{
+				temp[k] = board[i+2][j];
+				k++;
+			}
+		}
+	}
+	
+	if(CheckStreak(temp, boardSize - 2, StreakRule(boardSize)) == 1)
+		return 1;
 	
 	/* jika tidak ada yang sama, belum ada pemenang */
 	return 0;
