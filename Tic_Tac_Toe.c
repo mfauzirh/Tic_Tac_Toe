@@ -27,6 +27,7 @@ typedef struct
 void MainMenuUI();
 void HighscoreUI();
 void GameModeUI();
+void ChooseOpponentUI();
 void HelpUI();
 void InputNameUI();
 void ChooseBoardUI();
@@ -40,18 +41,22 @@ void DrawBoard(char **board, int boardSize);
 /* Modul Logika */
 void MainMenu(int *choice);
 void GameMode(int *gameMode);
+void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
 void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume);
 char** CreateBoard(int boardSize);
 int StreakRule(int boardSize);
+int CheckStreak(char temp[], int boardSize);
 int CheckHorizontal(char **board, int boardSize);
 int CheckVertical(char **board, int boardSize);
 int CheckMainDiagonal(char **board, int boardSize);
 int CheckSecDiagonal(char **board, int boardSize);
 int CheckWin(char **board, int boardSize);
-void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode);
+void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent);
 void GetUserInput(char **board, MoveFormat *playerMove,  int *currentPlayer, int boardSize);
-void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize);
+void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize, int opponent);
+void RandomBasedBoard(char **board, MoveFormat *computerMove,int boardSize);
+void RandomBasedPlayer(char **board, MoveFormat *move,int boardSize);
 int isValidInput(char **board, MoveFormat *playerMove, int BoardSize);
 void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer);
 void InputName(PlayerName *playerName);
@@ -72,7 +77,7 @@ int main()
 	
 	/* Game Variabel */
 	char **board;
-	int boardSize = 3, col, row, currentPlayer = 1, isWin = 0, maxRound, roundPlayed = 0;
+	int boardSize = 3, col, row, currentPlayer = 1, isWin = 0, maxRound, roundPlayed = 0, opponent = 2;
 	char winner[12];
 	
 	/* Time variabel */
@@ -88,8 +93,11 @@ int main()
 		
 		GameMode(&gameMode);
 		
+		if(gameMode == 2)
+			ChooseOpponent(&opponent);
+		
 		/* Clear \n after scanf */
-		while ( (choice = getchar()) != '\n' && choice != EOF );
+		//while ( (choice = getchar()) != '\n' && choice != EOF );
 		
 		InputName(&playerName);
 		
@@ -108,7 +116,7 @@ int main()
 			isWin = CheckWin(board, boardSize);
 			if(isWin > 0)
 				break;
-			MakeMove(board, boardSize, &currentPlayer, gameMode);
+			MakeMove(board, boardSize, &currentPlayer, gameMode, opponent);
 			roundPlayed++;
 		}
 		
@@ -184,6 +192,22 @@ void GameModeUI()
 	printf("       ============================\n");
 	printf("      ||[1] For Player Vs Player  ||\n");
 	printf("      ||[2] For Player Vs Computer||\n");
+	printf("       ============================\n");
+	printf("\nYour Choice : ");
+}
+
+void ChooseOpponentUI()
+{
+	system("CLS");
+	printf("\t      <<============>>\n");
+	printf("\t|====                 ====|\n");
+	printf("\t|         Opponent        |\n");
+	printf("\t|====                 ====|\n");
+	printf("\t      <<== Choose ==>>\n\n");
+	
+	printf("       ============================\n");
+	printf("      ||[1] The Randomizer        ||\n");
+	printf("      ||[2] The Stalker           ||\n");
 	printf("       ============================\n");
 	printf("\nYour Choice : ");
 }
@@ -315,15 +339,16 @@ void Draw3x3Board(char**board)
     system("cls");
     printf("\n\n\tTic Tac Toe\n\n");
     printf("Player 1 (X) -- Player 2 (O)\n\n");
+    printf("   0     1     2  \n");
     printf(" _________________\n");
     printf("|     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |\n",board[0][0],board[0][1],board[0][2]);
+    printf("|  %c  |  %c  |  %c  | 0\n",board[0][0],board[0][1],board[0][2]);
     printf("|_____|_____|_____|\n");
     printf("|     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |\n",board[1][0],board[1][1],board[1][2]);
+    printf("|  %c  |  %c  |  %c  | 1\n",board[1][0],board[1][1],board[1][2]);
     printf("|_____|_____|_____|\n");
     printf("|     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |\n",board[2][0],board[2][1],board[2][2]);
+    printf("|  %c  |  %c  |  %c  | 2\n",board[2][0],board[2][1],board[2][2]);
     printf("|_____|_____|_____|\n");
     printf("\n\n");
 }
@@ -334,21 +359,22 @@ void Draw5x5Board(char**board)
     system("cls");
     printf("\n\n\tTic Tac Toe\n\n");
     printf("Player 1 (X) -- Player 2 (O)\n\n");
+    printf("   0     1     2     3     4  \n");
     printf(" _____________________________\n");
     printf("|     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[0][0],board[0][1],board[0][2],board[0][3],board[0 ][4]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  | 0\n",board[0][0],board[0][1],board[0][2],board[0][3],board[0 ][4]);
     printf("|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[1][0],board[1][1],board[1][2],board[1][3],board[1][4]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  | 1\n",board[1][0],board[1][1],board[1][2],board[1][3],board[1][4]);
     printf("|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[2][0],board[2][1],board[2][2],board[2][3],board[2][4]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  | 2\n",board[2][0],board[2][1],board[2][2],board[2][3],board[2][4]);
     printf("|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[3][0],board[3][1],board[3][2],board[3][3],board[3][4]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  | 3\n",board[3][0],board[3][1],board[3][2],board[3][3],board[3][4]);
     printf("|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[4][0],board[4][1],board[4][2],board[4][3],board[4][4]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  | 4\n",board[4][0],board[4][1],board[4][2],board[4][3],board[4][4]);
     printf("|_____|_____|_____|_____|_____|\n");
     printf("\n\n");
 }
@@ -359,27 +385,28 @@ void Draw7x7Board(char**board)
     system("cls");
     printf("\n\n\tTic Tac Toe\n\n");
     printf("Player 1 (X) -- Player 2 (O)\n\n");
+    printf("   0     1     2     3     4     5     6  \n");
     printf(" _________________________________________\n");
     printf("|     |     |     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[0][0],board[0][1],board[0][2],board[0][3],board[0][4], board[0][5],board[0][6]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  | 0\n",board[0][0],board[0][1],board[0][2],board[0][3],board[0][4], board[0][5],board[0][6]);
     printf("|_____|_____|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[1][0],board[1][1],board[1][2],board[1][3],board[1][4], board[1][5],board[1][6]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  | 1\n",board[1][0],board[1][1],board[1][2],board[1][3],board[1][4], board[1][5],board[1][6]);
     printf("|_____|_____|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[2][0],board[2][1],board[2][2],board[2][3],board[2][4], board[2][5],board[2][6]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  | 2\n",board[2][0],board[2][1],board[2][2],board[2][3],board[2][4], board[2][5],board[2][6]);
     printf("|_____|_____|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[3][0],board[3][1],board[3][2],board[3][3],board[3][4], board[3][5],board[3][6]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  | 3\n",board[3][0],board[3][1],board[3][2],board[3][3],board[3][4], board[3][5],board[3][6]);
     printf("|_____|_____|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[4][0],board[4][1],board[4][2],board[4][3],board[4][4], board[4][5],board[4][6]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  | 4\n",board[4][0],board[4][1],board[4][2],board[4][3],board[4][4], board[4][5],board[4][6]);
     printf("|_____|_____|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[5][0],board[5][1],board[5][2],board[5][3],board[5][4], board[5][5],board[5][6]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  | 5\n",board[5][0],board[5][1],board[5][2],board[5][3],board[5][4], board[5][5],board[5][6]);
     printf("|_____|_____|_____|_____|_____|_____|_____|\n");
     printf("|     |     |     |     |     |     |     |\n");
-    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |\n",board[6][0],board[6][1],board[6][2],board[6][3],board[6][4], board[6][5],board[6][6]);
+    printf("|  %c  |  %c  |  %c  |  %c  |  %c  |  %c  |  %c  | 6\n",board[6][0],board[6][1],board[6][2],board[6][3],board[6][4], board[6][5],board[6][6]);
     printf("|_____|_____|_____|_____|_____|_____|_____|\n");
     printf("\n\n");
 }
@@ -431,6 +458,14 @@ void GameMode(int *gameMode)
 	}while(*gameMode == 0);
 }
 
+void ChooseOpponent(int *opponent)
+{
+	do
+	{
+		ChooseOpponentUI();
+		scanf("%d", opponent);
+	}while(*opponent != 1 && *opponent != 2);
+}
 void ChooseBoard(int *boardSize)
 {
 	do
@@ -497,32 +532,82 @@ int StreakRule(int boardSize)
 	return numberToStreak;
 }
 
+int CheckStreak(char board[], int boardSize)
+{
+	if(boardSize == 5) // 
+	{
+		// Check semua kemungkinan pola menang
+		// Pola Streak  : _XXXX OR XXXX_
+		if
+		(
+			(board[0] == board[1] && board[1] == board[2] && board[2] == board[3]) ||
+			(board[1] == board[2] && board[2] == board[3] && board[3] == board[4])	
+		)
+		{
+			if(board[2] == 'X' || board[2] == 'O')
+				return 1;
+		}
+	}else if(boardSize == 7)
+	{
+		// Check semua kemungkinan pola menang
+		// pola Streak : __XXXXX OR _XXXXX_ OR XXXXX__
+		if
+		(
+			(board[0] == board[1] && board[1] == board[2] && board[2] == board[3] && board[3] == board[4]) ||
+			(board[2] == board[3] && board[3] == board[4] && board[4] == board[5] && board[5] == board[6]) ||
+			(board[1] == board[2] && board[2] == board[3] && board[3] == board[4] && board[4] == board[5])	
+		)
+		{
+			if(board[2] == 'X' || board[2] == 'O')
+				return 1;
+		}
+	}
+}
+
 /* Modul untuk memeriksa kemenangan secara horizontal */
 int CheckHorizontal(char **board, int boardSize)
 {
+	char temp[boardSize];
+	int i, j;
+	
+	for(i = 0; i < boardSize; i++)
+	{
+		for(j = 0; j < boardSize; j++)
+			temp[j] = board[i][j];
+		
+		if(CheckStreak(temp, boardSize) == 1)
+		{
+			return 1;
+		}
+	}
+	
+	return 0;
+	
+	/*
 	int i, j, count = 0;
 	int numberToStreak = StreakRule(boardSize);
 	for(i = 0; i < boardSize; i++)
 	{
 		for(j = 1; j < boardSize; j++)
 		{
-			/* memeriksa apakah kotak tidak kosong */
+			// memeriksa apakah kotak tidak kosong 
 			if(board[i][j-1] != ' ')
 			{
-				/* memeriksa apakah kotak memiliki simbol yang samas */
+				// memeriksa apakah kotak memiliki simbol yang samas 
 				if(board[i][j-1] == board[i][j])
 					count++;
 			}
 		}
 		
-		/* jika simbol streak, maka menang */
+		// jika simbol streak, maka menang 
 		if(count >= numberToStreak)
 			return 1;
 		else
 			count = 0;
 	}
-	/* jika tidak ada yang sama, belum ada pemenang */
+	// jika tidak ada yang sama, belum ada pemenang 
 	return 0;
+	*/
 }
 
 
@@ -811,7 +896,8 @@ int CheckWin(char **board, int boardSize)
 		return 0;
 }
 
-void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode)
+/* Melakukan Pergerakan di papan */
+void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent)
 {
 	/* Get Input */
 	MoveFormat Move;
@@ -825,7 +911,7 @@ void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode)
 		if(*currentPlayer == 1)
 			GetUserInput(board, &Move, currentPlayer, boardSize);
 		else if(*currentPlayer == 2)
-			GetComputerInput(board, &Move, currentPlayer, boardSize);	
+			GetComputerInput(board, &Move, currentPlayer, boardSize, opponent);	
 	}
 	
 	/* Fill to Board */
@@ -849,8 +935,21 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 	}while(isValid == 0);
 }
 
-void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize)
+void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize, int opponent)
 {	
+	if(opponent == 1)
+	{
+		RandomBasedBoard(board, computerMove, boardSize);
+	}else if(opponent == 2)
+	{
+		RandomBasedPlayer(board, computerMove, boardSize);
+	}
+	
+	
+}
+
+void RandomBasedBoard(char **board, MoveFormat *computerMove,int boardSize)
+{
 	int row, col;
 	int moveAvailable[boardSize*boardSize][2];
 	int currentIdx = 0;
@@ -878,7 +977,71 @@ void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer
 	// mengisi kotak kosong dengan langkah yang telah di generate
 	computerMove->row = moveAvailable[randMove][0];
 	computerMove->col = moveAvailable[randMove][1];
+}
+
+void RandomBasedPlayer(char **board, MoveFormat *move,int boardSize)
+{
+	int moveAvailable[4][2];
+	int randMove = 0;
+	int count = 0;
 	
+	// Check bottom box
+	if(move->row + 1 < boardSize)
+	{
+		if(board[move->row + 1][move->col] == ' ')
+		{
+			moveAvailable[count][0] = move->row + 1;
+			moveAvailable[count][1] = move->col;
+			count++;
+		}
+	}
+	
+	// check top box
+	if(move->row - 1 >= 0)
+	{
+		if(board[move->row - 1][move->col] == ' ')
+		{
+			moveAvailable[count][0] = move->row - 1;
+			moveAvailable[count][1] = move->col;
+			count++;
+		}
+	}
+	
+	// check right box
+	if(move->col + 1 < boardSize)
+	{
+		if(board[move->row][move->col + 1] == ' ')
+		{
+			moveAvailable[count][0] = move->row;
+			moveAvailable[count][1] = move->col+1;
+			count++;
+		}
+	}
+	
+	// check left box
+	if(move->col - 1 >= 0)
+	{
+		if(board[move->row][move->col - 1] == ' ')
+		{
+			moveAvailable[count][0] = move->row;
+			moveAvailable[count][1] = move->col-1;
+			count++;
+		}
+	}
+	if(count == 0)
+	{
+		RandomBasedBoard(board, move, boardSize);
+	}else
+	{
+		// Randomized
+	srand(time(NULL));
+	// Memilih secara acak kotak yang ingin di isi dari kotak kosong yang tersedia
+	randMove = rand() % count;
+	
+	// mengisi kotak kosong dengan langkah yang telah di generate
+	move->row = moveAvailable[randMove][0];
+	move->col = moveAvailable[randMove][1];
+	}
 }
 
 int isValidInput(char **board, MoveFormat *playerMove, int boardSize)
