@@ -298,15 +298,16 @@ void ChooseBoardUI()
 void WinnerUI(char winner[], int timeConsume)
 {
 	system("CLS");
-	printf("\t      <<============>>\n");
-	printf("\t|====                  ====|\n");
-	printf("\t|         Gameover         |\n");
-	printf("\t|====                  ====|\n");
-	printf("\t      <<== winner ==>>\n\n");
+	printf("\t\t            <<============>>\n");
+	printf("\t\t      |====                  ====|\n");
+	printf("\t\t      |         Gameover         |\n");
+	printf("\t\t      |====                  ====|\n");
+	printf("\t\t            <<== winner ==>>\n\n");
 	
-	printf("       =============================================================\n");
-	printf("           %s Memenangkan permainan dengan waktu %d detik ++>\n", winner, timeConsume);
-	printf("       =============================================================\n");
+	printf("       =========================================================\n");
+	printf("                              %s                        \n", winner);
+	printf("            Memenangkan permainan dengan waktu %d detik ++>\n", timeConsume);
+	printf("       =========================================================\n");
 	
 	printf("       ================================\n");
 	printf("      ||Press '1' To Exit             ||\n");
