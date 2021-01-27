@@ -3,6 +3,8 @@
 #include <time.h>
 #include <string.h>
 
+#define HIGHSCORE_FILENAME "highscores.dat"
+
 /* =====================================*/
 /*				UDT						*/
 /* =====================================*/
@@ -15,9 +17,18 @@ typedef struct
 
 typedef struct
 {
-	char NameP1[12];
-	char NameP2[12];
+	char NameP1[255];
+	char NameP2[255];
 } PlayerName;
+
+typedef struct
+{
+	char name[20];
+	int duration;
+	int boardSize;
+}HighscoreData;
+
+HighscoreData data, listData[100], tempData; // highscore data
 
 /* =====================================*/
 /*				Deklarasi Modul			*/
@@ -25,7 +36,6 @@ typedef struct
 
 /* Modul Tampilan */
 void MainMenuUI();
-void HighscoreUI();
 void GameModeUI();
 void ChooseOpponentUI();
 void HelpUI();
@@ -43,7 +53,7 @@ void MainMenu();
 void GameMode(int *gameMode);
 void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
-void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume);
+void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize);
 char** CreateBoard(int boardSize);
 int StreakRule(int boardSize);
 int CheckStreak(char temp[], int boardSize, int numStreak);
@@ -62,6 +72,13 @@ void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer)
 void InputName(PlayerName *playerName);
 void DeleteBoard(char **board, int boardSize);
 
+/* Modul Highscore */
+void Highscores();
+void WriteData(char winner[15], int duration, int boardSize);
+int ReadData();
+void SwapData(int x, int y);
+void SortHighscores(int criteria, int amount);
+int SortCriteria(int i, int k, int criteria);
 
 /* =====================================*/
 /*				Modul Utama				*/
@@ -128,9 +145,9 @@ int main()
 		// Menampilkan keadaan akhir papan permainan
 		DrawBoard(board, boardSize);
 		printf("Game Over, press any key to continue : ");getch();
-		
+
 		// Menampilkan tampilan Game Over
-		GameOver(currentPlayer, playerName, roundPlayed, maxRound, timeConsume);
+		GameOver(currentPlayer, playerName, roundPlayed, maxRound, timeConsume, boardSize);
 		
 		// Menghapus papan saat ini
 		DeleteBoard(board, boardSize);
@@ -162,19 +179,6 @@ void MainMenuUI()
     printf("      ||Press '4' To Help          ||\n");
     printf("       =============================\n");
 	printf("\nYour Choice : ");
-}
-
-void HighscoreUI()
-{
-	system("CLS");
-	printf("\t      <<==========>>\n");
-	printf("\t|====               ====|\n");
-	printf("\t|       HIGHSCORE       |\n");
-	printf("\t|====               ====|\n");
-	printf("\t      <<== User ==>>\n\n");
-	printf("John : 5 Minutes to clear\n\n");
-	printf("enter any key to go back : ");
-	getch();
 }
 
 void GameModeUI()
@@ -434,7 +438,7 @@ void MainMenu()
 		switch(choice)
 		{
 			case 1: break;
-			case 2: HighscoreUI(); break;
+			case 2: Highscores(); break;
 			case 3: exit(0); break;
 			case 4: HelpUI();
 		}
@@ -481,9 +485,9 @@ void ChooseBoard(int *boardSize)
 	}while(*boardSize == 0);
 }
 
-void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume)
+void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize)
 {
-	char winner[12];
+	char winner[15];
 	int choice;
 	int isWin;
 	if(roundPlayed != maxRound)
@@ -496,6 +500,9 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 		isWin = 1;
 	}else if(roundPlayed == maxRound)
 		isWin = 0;
+	
+	// Menulis data ke file higscore
+	WriteData(winner, timeConsume, boardSize);
 	
 	do
 	{
@@ -1068,11 +1075,35 @@ void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer)
 
 void InputName(PlayerName *playerName)
 {
-	InputNameUI();
-	printf("Input Player 1 Name : ");scanf("%s", &playerName->NameP1);
-	//fgets(playerName->NameP1, 12, stdin);
-	printf("Input Player 2 Name  : ");scanf("%s", &playerName->NameP2);
-	//fgets(playerName->NameP2, 12, stdin);
+
+	// Membersihkan \n dari input sebelumnnya
+	fflush(stdin);
+	
+	do
+	{
+		InputNameUI();
+		if(playerName->NameP1[0] == '\n')
+			printf("Harap masukan setidaknya 1 huruf\n");
+			
+		printf("Input Player 1 Name : ");
+		fgets(playerName->NameP1, 15, stdin);
+	}while(playerName->NameP1[0] == '\n');
+	
+	// Mengambil karakter \n efek dari fgets
+	strtok(playerName->NameP1, "\n");
+	
+	do
+	{
+		InputNameUI();
+		if(playerName->NameP2[0] == '\n')
+			printf("Harap masukan setidaknya 1 huruf\n");
+		
+		printf("Input Player 2 Name : ");
+		fgets(playerName->NameP2, 15, stdin);
+	}while(playerName->NameP2[0] == '\n');
+	
+	// Mengambil karakter \n efek dari fgets
+	strtok(playerName->NameP1, "\n");
 }
 
 /* Dealocate memory from board */
@@ -1083,3 +1114,107 @@ void DeleteBoard(char **board, int boardSize)
 		free(board[i]);
 	free(board);
 }
+
+// Highscore Modul
+void Highscores()
+{
+	int amount, i, criteria = 1;
+	amount = ReadData();
+	do
+	{
+		system("CLS");
+		printf("\t\t==================\n");
+		printf("\t\t     Highscores   \n");
+		printf("\t\t==================\n\n");
+		printf("\t\t==================\n");
+		printf("\tKetik [1] untuk mengurutkan berdasarkan durasi\n");
+		printf("\tKetik [2] untuk mengurutkan berdasarkan ukuran papan\n");
+		printf("\tKetik [3] untuk mengurutkan berdasarkan nama\n");
+		printf("\tKetik [4] untuk kembali ke main menu\n\n\n");
+		
+		SortHighscores(criteria, amount);
+		printf("Nama Pemain\t\tDurasi Permainan(detik)\t\tUkuran Papan\n");
+		for(i = 0; i < amount; i++)
+		{
+			printf("%-20s", listData[i].name);
+			printf("\t\t  ");
+			printf("%d", listData[i].duration);
+			printf("\t\t\t     ");
+			printf("%d", listData[i].boardSize);
+			printf("\n");
+		}
+		printf("sort berdasarkan : ");scanf("%d", &criteria);
+	}while(criteria != 4);
+}
+
+void WriteData(char winner[15], int duration, int boardSize)
+{
+	// Mengisikan data ke highscore
+	strcpy(data.name, winner);
+	data.duration = duration;
+	data.boardSize = boardSize;
+	
+	// mengisikan data ke file highscores
+	FILE *fp = fopen(HIGHSCORE_FILENAME, "ab"); 
+	fwrite(&data, sizeof(HighscoreData), 1, fp);
+	fclose(fp);
+	
+}
+
+int ReadData()
+{
+	// membaca semua aata yang ada di file highscores
+	// mengembalikan jumlah data yang telah di baca
+	int amount = 0;
+	FILE *fp = fopen(HIGHSCORE_FILENAME, "rb");
+	
+	while( fread(&listData[amount], sizeof(HighscoreData), 1, fp) == 1)
+		amount++;
+		
+	fclose(fp);
+	return amount;
+}
+
+int SortCriteria(int i, int j, int criteria)
+{
+	if(criteria == 1)
+	{
+		// mengurutkan berdasarkan durasi permainan
+		return listData[j].duration < listData[i].duration;
+	} else if(criteria == 2)
+	{
+		// mengurutkan berdasarkan ukuran papan permainan
+		return listData[j].boardSize > listData[i].boardSize;
+	} else if(criteria == 3)
+	{
+		// mengurutkan berdasarkan nama
+		return strcmp(listData[j].name, listData[i].name) < 0;
+	}
+}
+
+void SortHighscores(int criteria, int amount)
+{
+	// size merupakan ukuran papan permainan
+	// time merupakan durasi permainan
+	int i, j;
+	
+	for(i = 0; i < amount - 1; i++)
+	{
+		for(j = i + 1; j < amount; j++)
+		{
+			if(SortCriteria(i, j, criteria))
+			{
+				SwapData(i, j);
+			}
+		}
+	}
+}
+
+void SwapData(int x, int y)
+{
+	int temp;
+	tempData = listData[y] ;
+	listData[y] = listData[x];
+	listData[x] = tempData ;
+}
+
