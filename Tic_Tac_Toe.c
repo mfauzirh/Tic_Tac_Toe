@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <windows.h>
 
 #define HIGHSCORE_FILENAME "highscores.dat"
 
@@ -63,6 +64,7 @@ int CheckMainDiagonal(char **board, int boardSize);
 int CheckSecDiagonal(char **board, int boardSize);
 int CheckWin(char **board, int boardSize);
 void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent);
+int InputWithTime(unsigned int timeout);
 void GetUserInput(char **board, MoveFormat *playerMove,  int *currentPlayer, int boardSize);
 void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize, int opponent);
 void RandomBasedBoard(char **board, MoveFormat *computerMove,int boardSize);
@@ -143,6 +145,12 @@ int main()
 		timeConsume = elapsedTime / (CLOCKS_PER_SEC);
 		
 		// Menampilkan keadaan akhir papan permainan
+		Beep(600, 300);
+		Beep(700, 300);
+		Beep(550, 500);
+		Beep(700, 300);
+		Beep(700, 300);
+		
 		DrawBoard(board, boardSize);
 		printf("Game Over, press any key to continue : ");getch();
 
@@ -503,7 +511,8 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 		isWin = 0;
 	
 	// Menulis data ke file higscore
-	WriteData(winner, timeConsume, boardSize);
+	if(isWin == 1)
+		WriteData(winner, timeConsume, boardSize);
 	
 	do
 	{
@@ -917,6 +926,19 @@ void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int
 	FillBoard(board, Move, boardSize, currentPlayer);
 }
 
+int InputWithTime(unsigned int timeout)
+{
+	for (; timeout != 0; timeout--)
+    {
+        if (kbhit())
+        {
+            return getch();
+        }
+    }
+
+    return -1;
+}
+
 void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int boardSize)
 {
 	int isValid = 1;
@@ -928,8 +950,23 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 			printf("Inputan tidak valid, harap masukan kembali.\n\n");
 		}
 		printf("Giliran player %d. \n", *currentPlayer);
-		printf("Masukan baris : "); scanf("%d", &playerMove->row);
-		printf("Masukan kolom : "); scanf("%d", &playerMove->col);
+		//printf("Masukan baris : "); scanf("%d", &playerMove->row);
+		//printf("Masukan kolom : "); scanf("%d", &playerMove->col);
+		printf("Masukan baris : "); playerMove->row = InputWithTime(50000) - '0'; 
+		if(playerMove->row != -49) 
+			printf("%d", playerMove->row);
+		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(50000) - '0';
+		if(playerMove->col != -49) 
+			printf("%d", playerMove->col);
+		
+		if(playerMove->row == -49 || playerMove->col == -49)
+		{
+			GetComputerInput(board, playerMove, currentPlayer, boardSize, 1);
+			Beep(600, 300);
+			Beep(450, 500);
+		}
+			
+			
 		isValid = isValidInput(board, playerMove, boardSize);
 	}while(isValid == 0);
 }
