@@ -952,10 +952,10 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 		printf("Giliran player %d. \n", *currentPlayer);
 		//printf("Masukan baris : "); scanf("%d", &playerMove->row);
 		//printf("Masukan kolom : "); scanf("%d", &playerMove->col);
-		printf("Masukan baris : "); playerMove->row = InputWithTime(50000) - '0'; 
+		printf("Masukan baris : "); playerMove->row = InputWithTime(1200000) - '0'; 
 		if(playerMove->row != -49) 
 			printf("%d", playerMove->row);
-		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(50000) - '0';
+		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(1200000) - '0';
 		if(playerMove->col != -49) 
 			printf("%d", playerMove->col);
 		
