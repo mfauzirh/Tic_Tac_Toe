@@ -181,7 +181,7 @@ void MainMenuUI()
 	printf("       =============================\n");
 	printf("      ||Press '1' To Play The Game ||\n");
 	printf("      ||Press '2' To Look Highscore||\n");
-	printf("      ||Press '3' How To Play      ||\n");
+	printf("      ||Press '3' To Read Guide    ||\n");
     printf("      ||Press '4' To Exit The Game ||\n");
     printf("       =============================\n");
 	printf("\nYour Choice : ");
