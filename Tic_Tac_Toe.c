@@ -920,13 +920,15 @@ void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int
 
 int InputWithTime(unsigned int timeout)
 {
-	for (; timeout != 0; timeout--)
-    {
-        if (kbhit())
+	clock_t startTime = clock();
+	timeout *= 1000;
+	do
+	{
+		if (kbhit())
         {
             return getch();
         }
-    }
+	}while(clock() < startTime + timeout);
 
     return -1;
 }
@@ -942,10 +944,10 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 			printf("Inputan tidak valid, harap masukan kembali.\n\n");
 		}
 		printf("Giliran player %d. \n", *currentPlayer);
-		printf("Masukan baris : "); playerMove->row = InputWithTime(100000) - '0'; 
+		printf("Masukan baris : "); playerMove->row = InputWithTime(5) - '0'; 
 		if(playerMove->row >= 0 && playerMove->row < boardSize) 
 			printf("%d", playerMove->row);
-		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(100000) - '0';
+		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(5) - '0';
 		if(playerMove->row >= 0 && playerMove->col < boardSize) 
 			printf("%d", playerMove->col);
 		
