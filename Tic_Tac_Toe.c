@@ -5,6 +5,7 @@
 #include <windows.h>
 
 #define HIGHSCORE_FILENAME "highscores.dat"
+#define NameLength 13
 
 /* ======================================*/
 /*				UDT						*/
@@ -73,6 +74,7 @@ int isValidInput(char **board, MoveFormat *playerMove, int BoardSize);
 void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer);
 void InputName(PlayerName *playerName);
 void DeleteBoard(char **board, int boardSize);
+void PlayMusic(int list);
 
 /* Modul Highscore */
 void Highscores();
@@ -145,11 +147,7 @@ int main()
 		timeConsume = elapsedTime / (CLOCKS_PER_SEC);
 		
 		// Menampilkan keadaan akhir papan permainan
-		Beep(600, 300);
-		Beep(700, 300);
-		Beep(550, 500);
-		Beep(700, 300);
-		Beep(700, 300);
+		PlayMusic(2);
 		
 		DrawBoard(board, boardSize);
 		printf("Game Over, press any key to continue : ");getch();
@@ -183,8 +181,8 @@ void MainMenuUI()
 	printf("       =============================\n");
 	printf("      ||Press '1' To Play The Game ||\n");
 	printf("      ||Press '2' To Look Highscore||\n");
-	printf("      ||Press '3' To Exit The Game ||\n");
-    printf("      ||Press '4' To Help          ||\n");
+	printf("      ||Press '3' How To Play      ||\n");
+    printf("      ||Press '4' To Exit The Game ||\n");
     printf("       =============================\n");
 	printf("\nYour Choice : ");
 }
@@ -296,9 +294,9 @@ void ChooseBoardUI()
 	printf("\t         <<== Choose ==>>\n\n");
 	
 	printf("            ========================\n");
-	printf("           ||Press '3' For 3x3 Size||\n");
-	printf("           ||Press '5' For 5x5 Size||\n");
-	printf("           ||Press '7' For 7x7 Size||\n");
+	printf("           ||Press '1' For 3x3 Size||\n");
+	printf("           ||Press '2' For 5x5 Size||\n");
+	printf("           ||Press '3' For 7x7 Size||\n");
 	printf("            ========================\n");
 	printf("\nYour Choice : ");
 }
@@ -443,13 +441,13 @@ void MainMenu()
 	do
 	{
 		MainMenuUI();
-		scanf("%d", &choice);
+		choice = getch() - '0';
 		switch(choice)
 		{
 			case 1: break;
 			case 2: Highscores(); break;
-			case 3: exit(0); break;
-			case 4: HelpUI();
+			case 3: HelpUI(); break;
+			case 4: exit(0); break;
 		}
 	}while(choice != 1);
 }
@@ -459,14 +457,8 @@ void GameMode(int *gameMode)
 	do
 	{
 		GameModeUI();
-		scanf("%d", gameMode);
-		switch(*gameMode)
-		{
-			case 1: *gameMode = 1; break;
-			case 2: *gameMode = 2; break;
-			default: *gameMode = 0; break;
-		}
-	}while(*gameMode == 0);
+		*gameMode = getch() - '0';
+	}while(*gameMode != 1 && *gameMode != 2);
 }
 
 void ChooseOpponent(int *opponent)
@@ -474,7 +466,7 @@ void ChooseOpponent(int *opponent)
 	do
 	{
 		ChooseOpponentUI();
-		scanf("%d", opponent);
+		*opponent = getch() - '0';
 	}while(*opponent != 1 && *opponent != 2);
 }
 
@@ -483,12 +475,12 @@ void ChooseBoard(int *boardSize)
 	do
 	{
 		ChooseBoardUI();
-		scanf("%d", boardSize);
+		*boardSize = getch() - '0';
 		switch(*boardSize)
 		{
-			case 3: *boardSize = 3; break;
-			case 5: *boardSize = 5; break;
-			case 7: *boardSize = 7; break;
+			case 1: *boardSize = 3; break;
+			case 2: *boardSize = 5; break;
+			case 3: *boardSize = 7; break;
 			default: *boardSize = 0; break;
 		}
 	}while(*boardSize == 0);
@@ -496,7 +488,7 @@ void ChooseBoard(int *boardSize)
 
 void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize)
 {
-	char winner[15];
+	char winner[NameLength];
 	int choice;
 	int isWin;
 	if(roundPlayed != maxRound)
@@ -521,7 +513,7 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 		else if(isWin == 0)
 			TieUI();
 			
-		scanf("%d", &choice);
+		choice = getch() - '0';
 		if(choice == 1)
 			exit(0);
 		else if(choice == 2)
@@ -950,20 +942,17 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 			printf("Inputan tidak valid, harap masukan kembali.\n\n");
 		}
 		printf("Giliran player %d. \n", *currentPlayer);
-		//printf("Masukan baris : "); scanf("%d", &playerMove->row);
-		//printf("Masukan kolom : "); scanf("%d", &playerMove->col);
-		printf("Masukan baris : "); playerMove->row = InputWithTime(1200000) - '0'; 
-		if(playerMove->row != -49) 
+		printf("Masukan baris : "); playerMove->row = InputWithTime(100000) - '0'; 
+		if(playerMove->row >= 0 && playerMove->row < boardSize) 
 			printf("%d", playerMove->row);
-		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(1200000) - '0';
-		if(playerMove->col != -49) 
+		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(100000) - '0';
+		if(playerMove->row >= 0 && playerMove->col < boardSize) 
 			printf("%d", playerMove->col);
 		
 		if(playerMove->row == -49 || playerMove->col == -49)
 		{
 			GetComputerInput(board, playerMove, currentPlayer, boardSize, 1);
-			Beep(600, 300);
-			Beep(450, 500);
+			PlayMusic(1); // 1 for skip sound
 		}
 			
 			
@@ -1113,35 +1102,37 @@ void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer)
 
 void InputName(PlayerName *playerName)
 {
+	char buffer[255];
+	int inputLen = 5;
+	do
+	{
+		InputNameUI();
+		if(inputLen < 5 || inputLen > NameLength - 1)
+			printf("Masukan minimal 4 karakter dan maximal 12 karakter\n");
 
-	// Membersihkan \n dari input sebelumnnya
-	fflush(stdin);
+		fflush(stdin); // membersihkan inputan sebelumnnya
+		printf("Masukan Nama Player 1 : ");
+		fgets(buffer, 255, stdin);	
+		inputLen = strlen(buffer); // menghitung panjang inputan
+		buffer[inputLen - 1] = '\0'; // mengambil default \n dari fgets
+	}while(inputLen < 5 || inputLen > NameLength - 1);
+	
+	strncpy(playerName->NameP1, buffer, NameLength - 1);
 	
 	do
 	{
 		InputNameUI();
-		if(playerName->NameP1[0] == '\n')
-			printf("Harap masukan setidaknya 1 huruf\n");
-			
-		printf("Input Player 1 Name : ");
-		fgets(playerName->NameP1, 15, stdin);
-	}while(playerName->NameP1[0] == '\n');
+		if(inputLen < 5 || inputLen > NameLength - 1)
+			printf("Masukan minimal 4 karakter dan maximal 12 karakter\n");
+
+		fflush(stdin); // membersihkan inputan sebelumnnya
+		printf("Masukan Nama Player 2 : ");
+		fgets(buffer, 255, stdin);	
+		inputLen = strlen(buffer); // menghitung panjang inputan
+		buffer[inputLen - 1] = '\0'; // mengambil default \n dari fgets
+	}while(inputLen < 5 || inputLen > NameLength - 1);
 	
-	// Mengambil karakter \n efek dari fgets
-	strtok(playerName->NameP1, "\n");
-	
-	do
-	{
-		InputNameUI();
-		if(playerName->NameP2[0] == '\n')
-			printf("Harap masukan setidaknya 1 huruf\n");
-		
-		printf("Input Player 2 Name : ");
-		fgets(playerName->NameP2, 15, stdin);
-	}while(playerName->NameP2[0] == '\n');
-	
-	// Mengambil karakter \n efek dari fgets
-	strtok(playerName->NameP1, "\n");
+	strncpy(playerName->NameP2, buffer, NameLength - 1);
 }
 
 /* Dealocate memory from board */
@@ -1153,7 +1144,25 @@ void DeleteBoard(char **board, int boardSize)
 	free(board);
 }
 
-// Highscore Modul
+void PlayMusic(int list)
+{
+	// 1 for skip soundeffect
+	// 2 for gameover soundeffect
+	if(list == 1)
+	{
+		Beep(600, 300);
+		Beep(450, 500);	
+	}else if(list == 2)
+	{
+		Beep(600, 300);
+		Beep(700, 300);
+		Beep(550, 500);
+		Beep(700, 300);
+		Beep(700, 300);
+	}
+}
+
+// Highscore Modul : referensi imam saiful
 void Highscores()
 {
 	int amount, i, criteria = 1;
@@ -1170,6 +1179,12 @@ void Highscores()
 		printf("\tKetik [3] untuk mengurutkan berdasarkan nama\n");
 		printf("\tKetik [4] untuk kembali ke main menu\n\n\n");
 		
+		if(criteria < 1 || criteria > 4)
+		{
+			criteria = 1;
+			printf("[Masukan Inputan yang valid]\n\n");
+		}
+		
 		SortHighscores(criteria, amount);
 		printf("Nama Pemain\t\tDurasi Permainan(detik)\t\tUkuran Papan\n");
 		for(i = 0; i < amount; i++)
@@ -1178,10 +1193,10 @@ void Highscores()
 			printf("\t\t  ");
 			printf("%d", listData[i].duration);
 			printf("\t\t\t     ");
-			printf("%d", listData[i].boardSize);
-			printf("\n");
+			printf("%d\n", listData[i].boardSize);
 		}
-		printf("sort berdasarkan : ");scanf("%d", &criteria);
+		printf("\nsort berdasarkan : ");
+		criteria = getch() - '0';
 	}while(criteria != 4);
 }
 
