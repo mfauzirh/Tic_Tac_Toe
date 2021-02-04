@@ -185,7 +185,7 @@ void MainMenuUI()
 	printf("      ||Press '3' To Read Guide    ||\n");
     printf("      ||Press '4' To Exit The Game ||\n");
     printf("       =============================\n");
-	printf("\nYour Choice : ");
+	printf("\nYour Choice <(^_^)> : ");
 }
 
 void GameModeUI()
@@ -201,7 +201,7 @@ void GameModeUI()
 	printf("      ||[1] For Player Vs Player  ||\n");
 	printf("      ||[2] For Player Vs Computer||\n");
 	printf("       ============================\n");
-	printf("\nYour Choice : ");
+	printf("\nYour Choice <(^_^)> : ");
 }
 
 void ChooseOpponentUI()
@@ -217,7 +217,7 @@ void ChooseOpponentUI()
 	printf("      ||[1] The Randomizer        ||\n");
 	printf("      ||[2] The Stalker           ||\n");
 	printf("       ============================\n");
-	printf("\nYour Choice : ");
+	printf("\nYour Choice <(^_^)> : ");
 }
 
 void InputNameUI()
@@ -244,7 +244,7 @@ void ChooseBoardUI()
 	printf("           ||Press '2' For 5x5 Size||\n");
 	printf("           ||Press '3' For 7x7 Size||\n");
 	printf("            ========================\n");
-	printf("\nYour Choice : ");
+	printf("\nYour Choice <(^_^)> : ");
 }
 
 void WinnerUI(char winner[], int timeConsume)
@@ -265,7 +265,7 @@ void WinnerUI(char winner[], int timeConsume)
 	printf("      ||Press '1' To Exit             ||\n");
 	printf("      ||Press '2' To Back to main menu||\n");
 	printf("       ================================\n");
-	printf("\nYour Choice : ");
+	printf("\nYour Choice <(^_^)> : ");
 }
 
 void TieUI()
@@ -285,7 +285,7 @@ void TieUI()
 	printf("      ||Press '1' To Exit             ||\n");
 	printf("      ||Press '2' To Back to main menu||\n");
 	printf("       ================================\n");
-	printf("\nYour Choice : ");
+	printf("\nYour Choice <(^_^)> : ");
 }
 
 void Draw3x3Board(char**board)
