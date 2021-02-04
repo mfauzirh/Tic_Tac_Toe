@@ -1170,14 +1170,18 @@ void Highscores()
 	do
 	{
 		system("CLS");
-		printf("\t\t==================\n");
-		printf("\t\t     Highscores   \n");
-		printf("\t\t==================\n\n");
-		printf("\t\t==================\n");
-		printf("\tKetik [1] untuk mengurutkan berdasarkan durasi\n");
-		printf("\tKetik [2] untuk mengurutkan berdasarkan ukuran papan\n");
-		printf("\tKetik [3] untuk mengurutkan berdasarkan nama\n");
-		printf("\tKetik [4] untuk kembali ke main menu\n\n\n");
+		printf("\t\t\t     <<============>>\n");
+		printf("\t\t\t|====                ====|\n");
+		printf("\t\t\t|       Highscores       |\n");
+		printf("\t\t\t|====                ====|\n");
+		printf("\t\t\t     <<============>>\n\n");
+		
+		printf("\t ========================================================\n");
+		printf("\t|| Ketik [1] untuk mengurutkan berdasarkan durasi       ||\n");
+		printf("\t|| Ketik [2] untuk mengurutkan berdasarkan ukuran papan ||\n");
+		printf("\t|| Ketik [3] untuk mengurutkan berdasarkan nama         ||\n");
+		printf("\t|| Ketik [4] untuk kembali ke main menu                 ||\n");
+		printf("\t ========================================================\n\n\n");
 		
 		if(criteria < 1 || criteria > 4)
 		{
