@@ -282,7 +282,7 @@ void InputNameUI()
 	printf("\t|====                      ====|\n");
 	printf("\t|      Game Configuration      |\n");
 	printf("\t|====                      ====|\n");
-	printf("\t      <<== Only 8 char ==>>\n\n");
+	printf("\t      <<== Only 12 char ==>>\n\n");
 }
 
 void ChooseBoardUI()
