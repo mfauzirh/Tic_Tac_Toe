@@ -1109,7 +1109,7 @@ void InputName(PlayerName *playerName)
 	do
 	{
 		InputNameUI();
-		if(inputLen < 5 || inputLen > NameLength - 1)
+		if(inputLen < 5 || inputLen > NameLength)
 			printf("Masukan minimal 4 karakter dan maximal 12 karakter\n");
 
 		fflush(stdin); // membersihkan inputan sebelumnnya
@@ -1117,14 +1117,14 @@ void InputName(PlayerName *playerName)
 		fgets(buffer, 255, stdin);	
 		inputLen = strlen(buffer); // menghitung panjang inputan
 		buffer[inputLen - 1] = '\0'; // mengambil default \n dari fgets
-	}while(inputLen < 5 || inputLen > NameLength - 1);
+	}while(inputLen < 5 || inputLen > NameLength);
 	
 	strncpy(playerName->NameP1, buffer, NameLength - 1);
 	
 	do
 	{
 		InputNameUI();
-		if(inputLen < 5 || inputLen > NameLength - 1)
+		if(inputLen < 5 || inputLen > NameLength)
 			printf("Masukan minimal 4 karakter dan maximal 12 karakter\n");
 
 		fflush(stdin); // membersihkan inputan sebelumnnya
@@ -1132,7 +1132,7 @@ void InputName(PlayerName *playerName)
 		fgets(buffer, 255, stdin);	
 		inputLen = strlen(buffer); // menghitung panjang inputan
 		buffer[inputLen - 1] = '\0'; // mengambil default \n dari fgets
-	}while(inputLen < 5 || inputLen > NameLength - 1);
+	}while(inputLen < 5 || inputLen > NameLength);
 	
 	strncpy(playerName->NameP2, buffer, NameLength - 1);
 }
