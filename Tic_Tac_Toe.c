@@ -220,61 +220,6 @@ void ChooseOpponentUI()
 	printf("\nYour Choice : ");
 }
 
-void HelpUI()
-{
-	system("CLS");
-	printf("\t     <<============>>\n");
-	printf("\t|====                ====|\n");
-	printf("\t|          Help          |\n");
-	printf("\t|====                ====|\n");
-	printf("\t      <<== Choose ==>>\n\n");
-
-	printf("       =========================================================================================\n");
-	printf("      ||Di dalam game ini terdapat 2 Pemain Yaitu X dan O.                                     ||\n");
-	printf("      ||Cara mainnya adalah setiap pemain meletakkan nilai X atau O pada 9 kolom yang tersedia.||\n");
-	printf("       =========================================================================================\n");
-
-	printf("       ================================\n");
-	printf("      ||Press '1' To Next\n           ||");
-	printf("      ||Press '2' To Back to main menu||\n");
-	printf("       ================================\n");
-	printf("\nYour Choice : ");
-	
-	system("CLS");
-	printf("\t     <<============>>\n");
-	printf("\t|====                ====|\n");
-	printf("\t|          Help          |\n");
-	printf("\t|====                ====|\n");
-	printf("\t      <<== Choose ==>>\n\n");
-
-	printf("       ===========================================================\n");
-	printf("      ||Ketika index untuk meletakkan X atau O (ex: 1, 3, atau 5)||");
-	printf("       ===========================================================\n");
-
-	printf("       ================================\n");
-	printf("      ||Press '1' To Next             ||\n");
-	printf("      ||Press '2' To Previous         ||\n");
-	printf("      ||Press '3' To Back to main menu||\n");
-	printf("       ================================\n");
-	printf("\nYour Choice : ");
-	system("CLS");
-	printf("\t     <<============>>\n");
-	printf("\t|====                ====|\n");
-	printf("\t|          Help          |\n");
-	printf("\t|====                ====|\n");
-	printf("\t      <<== Choose ==>>\n\n");
-
-	printf("       =====================================================================================================================\n");
-	printf("      ||Untuk memenangkan permainan kamu harus dapat membentuk nilai X atau O berbentuk vertikal, horizontal, atau diagonal||");
-	printf("       =====================================================================================================================\n");
-	
-	printf("       ================================\n");
-	printf("      ||Press '1' To Previous         ||\n");
-	printf("      ||Press '2' To Back to main menu||\n");
-	printf("       ================================\n");
-	printf("\nYour Choice : ");
-}
-
 void InputNameUI()
 {
 	system("CLS");
