@@ -5,6 +5,7 @@
 #include <windows.h>
 
 #define HIGHSCORE_FILENAME "highscores.dat"
+#define HOW_TO_PLAY "howToPlay.txt"
 #define NameLength 13
 
 /* ======================================*/
@@ -40,7 +41,6 @@ HighscoreData data, listData[100], tempData; // highscore data
 void MainMenuUI();
 void GameModeUI();
 void ChooseOpponentUI();
-void HelpUI();
 void InputNameUI();
 void ChooseBoardUI();
 void WinnerUI(char winner[], int timeConsume);
@@ -52,6 +52,7 @@ void DrawBoard(char **board, int boardSize);
 
 /* Modul Logika */
 void MainMenu();
+void HowToPlay();
 void GameMode(int *gameMode);
 void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
@@ -72,7 +73,7 @@ void RandomBasedBoard(char **board, MoveFormat *computerMove,int boardSize);
 void RandomBasedPlayer(char **board, MoveFormat *move,int boardSize);
 int isValidInput(char **board, MoveFormat *playerMove, int BoardSize);
 void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer);
-void InputName(PlayerName *playerName);
+void InputName(PlayerName *playerName, int gameMode);
 void DeleteBoard(char **board, int boardSize);
 void PlayMusic(int list);
 
@@ -116,7 +117,7 @@ int main()
 			ChooseOpponent(&opponent);
 		
 		// Menginputkan nama pemain
-		InputName(&playerName);
+		InputName(&playerName, gameMode);
 		
 		// Memilih ukuran papan permainan
 		ChooseBoard(&boardSize);
@@ -446,10 +447,31 @@ void MainMenu()
 		{
 			case 1: break;
 			case 2: Highscores(); break;
-			case 3: HelpUI(); break;
+			case 3: HowToPlay(); break;
 			case 4: exit(0); break;
 		}
 	}while(choice != 1);
+}
+
+void HowToPlay()
+{
+	system("cls");
+	FILE *fp = fopen(HOW_TO_PLAY, "r");
+	char c;
+	
+	if(fp != NULL)
+	{
+		while(!feof(fp))
+		{
+			c = fgetc(fp);
+			printf("%c", c);
+		}
+	
+		printf("\n\nPress Any Key to Continue..."); getch();
+	
+		fclose(fp);
+	}else if(fp == NULL)
+		printf("Unable To Create the file\n\n\n");
 }
 
 void GameMode(int *gameMode)
@@ -1102,7 +1124,7 @@ void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer)
 	}
 }
 
-void InputName(PlayerName *playerName)
+void InputName(PlayerName *playerName, int gameMode)
 {
 	char buffer[255];
 	int inputLen = 5;
@@ -1121,20 +1143,27 @@ void InputName(PlayerName *playerName)
 	
 	strncpy(playerName->NameP1, buffer, NameLength - 1);
 	
-	do
+	if(gameMode == 1)
 	{
-		InputNameUI();
-		if(inputLen < 5 || inputLen > NameLength)
-			printf("Masukan minimal 4 karakter dan maximal 12 karakter\n");
-
-		fflush(stdin); // membersihkan inputan sebelumnnya
-		printf("Masukan Nama Player 2 : ");
-		fgets(buffer, 255, stdin);	
-		inputLen = strlen(buffer); // menghitung panjang inputan
-		buffer[inputLen - 1] = '\0'; // mengambil default \n dari fgets
-	}while(inputLen < 5 || inputLen > NameLength);
+		do
+		{
+			InputNameUI();
+			if(inputLen < 5 || inputLen > NameLength)
+				printf("Masukan minimal 4 karakter dan maximal 12 karakter\n");
 	
-	strncpy(playerName->NameP2, buffer, NameLength - 1);
+			fflush(stdin); // membersihkan inputan sebelumnnya
+			printf("Masukan Nama Player 2 : ");
+			fgets(buffer, 255, stdin);	
+			inputLen = strlen(buffer); // menghitung panjang inputan
+			buffer[inputLen - 1] = '\0'; // mengambil default \n dari fgets
+		}while(inputLen < 5 || inputLen > NameLength);
+	
+		strncpy(playerName->NameP2, buffer, NameLength - 1);
+	}else
+	{
+		strcpy(playerName->NameP2, "Computer");
+	}
+	
 }
 
 /* Dealocate memory from board */
