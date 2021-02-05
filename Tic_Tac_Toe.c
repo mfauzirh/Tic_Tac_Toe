@@ -513,12 +513,17 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 	char winner[NameLength];
 	int choice;
 	int isWin;
+	int i;
+	
 	if(roundPlayed != maxRound)
 	{
 		if(currentPlayer == 1)
 			strcpy(winner, playerName.NameP2);
 		else if(currentPlayer == 2)
 			strcpy(winner, playerName.NameP1);
+			
+		for(i = 0; winner[i]; i++)
+			winner[i] = tolower(winner[i]);
 		
 		isWin = 1;
 	}else if(roundPlayed == maxRound)
@@ -1161,7 +1166,7 @@ void InputName(PlayerName *playerName, int gameMode)
 		strncpy(playerName->NameP2, buffer, NameLength - 1);
 	}else
 	{
-		strcpy(playerName->NameP2, "Computer");
+		strcpy(playerName->NameP2, "computer");
 	}
 	
 }
