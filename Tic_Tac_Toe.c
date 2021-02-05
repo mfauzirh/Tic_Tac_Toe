@@ -40,6 +40,7 @@ HighscoreData data, listData[100], tempData; // highscore data
 /* Modul Tampilan */
 void MainMenuUI();
 void GameModeUI();
+void LevellingUI();
 void ChooseOpponentUI();
 void InputNameUI();
 void ChooseBoardUI();
@@ -204,6 +205,22 @@ void GameModeUI()
 	printf("\nYour Choice <(^_^)> : ");
 }
 
+void LevellingUI()
+{
+		system("CLS");
+	printf("\t      <<============>>\n");
+	printf("\t|====                 ====|\n");
+	printf("\t|           Level         |\n");
+	printf("\t|====                 ====|\n");
+	printf("\t      <<== Choose ==>>\n\n");
+	
+	printf("       ============================\n");
+	printf("      ||[1] Easy                  ||\n");
+	printf("      ||[2] Medium                ||\n");
+	printf("      ||[3] Hard                  ||\n");
+	printf("       ============================\n");
+	printf("\nYour Choice <(^_^)> : ");
+}
 void ChooseOpponentUI()
 {
 	system("CLS");
