@@ -40,7 +40,7 @@ HighscoreData data, listData[100], tempData; // highscore data
 /* Modul Tampilan */
 void MainMenuUI();
 void GameModeUI();
-void LevellingUI();
+void LevelingUI();
 void ChooseOpponentUI();
 void InputNameUI();
 void ChooseBoardUI();
@@ -56,7 +56,7 @@ void DrawBoard(char **board, int boardSize);
 void MainMenu();
 void HowToPlay();
 void GameMode(int *gameMode);
-void Levelling (int *Level);
+void Leveling (int *Level);
 void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
 void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize);
@@ -120,7 +120,7 @@ int main()
 			ChooseOpponent(&opponent);
 			
 		//Menampilkan pilihan level
-		Levelling(&Level);
+		Leveling(&Level);
 		
 		// Menginputkan nama pemain
 		InputName(&playerName, gameMode);
@@ -208,7 +208,7 @@ void GameModeUI()
 	printf("\nYour Choice <(^_^)> : ");
 }
 
-void LevellingUI()
+void LevelingUI()
 {
 		system("CLS");
 	printf("\t      <<============>>\n");
@@ -465,13 +465,20 @@ void GameMode(int *gameMode)
 	}while(*gameMode != 1 && *gameMode != 2);
 }
 
-void Levelling(int *Level)
+void Leveling(int *Level)
 {
+	int waktu;
 	do
 	{
-		LevellingUI();
+		LevelingUI();
 		*Level = getch ()- '0';
-	} while (*Level != 1 && *Level != 2 && *Level != 3);
+		switch (*Level)
+		{
+			case 1: *Level =15; break;
+			case 2: *Level =10; break;
+			case 3: *Level =5; break;
+		}
+	} while (*Level != 15 && *Level != 10 && *Level != 5);
 }
 
 void ChooseOpponent(int *opponent)
@@ -954,7 +961,6 @@ int InputWithTime(unsigned int timeout)
 void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int boardSize, int Level)
 {
 	int isValid = 1;
-	int waktu;
 	do
 	{
 		if(isValid == 0)
@@ -964,24 +970,10 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 		}
 		printf("Giliran player %d. \n", *currentPlayer);
 		
-		//menentukan waktu berdasarkan tingkat kesulitan
-		if (Level==1)
-		{
-			waktu = 15;
-		} 
-		else if (Level==2)
-		{
-			waktu = 10;
-		}
-		else if (Level==3)
-		{
-			waktu = 5;
-		}
-		
-		printf("Masukan baris : "); playerMove->row = InputWithTime(waktu) - '0'; 
+		printf("Masukan baris : "); playerMove->row = InputWithTime(Level) - '0'; 
 		if(playerMove->row >= 0 && playerMove->row < boardSize) 
 			printf("%d", playerMove->row);
-		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(waktu) - '0';
+		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(Level) - '0';
 		if(playerMove->row >= 0 && playerMove->col < boardSize) 
 			printf("%d", playerMove->col);
 		
