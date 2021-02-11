@@ -430,7 +430,7 @@ void MainMenu()
 			case 1: break;
 			case 2: Highscores(); break;
 			case 3: HowToPlay(); break;
-			case 4: exit(0); break;
+			case 4: ThanksUI(); exit(0); break;
 		}
 	}while(choice != 1);
 }
@@ -969,7 +969,6 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 			printf("Inputan tidak valid, harap masukan kembali.\n\n");
 		}
 		printf("Giliran player %d. \n", *currentPlayer);
-		
 		printf("Masukan baris : "); playerMove->row = InputWithTime(Level) - '0'; 
 		if(playerMove->row >= 0 && playerMove->row < boardSize) 
 			printf("%d", playerMove->row);
