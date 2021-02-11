@@ -44,6 +44,7 @@ void LevellingUI();
 void ChooseOpponentUI();
 void InputNameUI();
 void ChooseBoardUI();
+void ThanksUI();
 void WinnerUI(char winner[], int timeConsume);
 void TieUI();
 void Draw3x3Board(char**);
@@ -267,6 +268,22 @@ void ChooseBoardUI()
 	printf("\nYour Choice <(^_^)> : ");
 }
 
+void ThanksUI()
+{
+	system("CLS");
+	printf("\t\t            <<============>>\n");
+	printf("\t\t      |====                  ====|\n");
+	printf("\t\t      |          Thanks          |\n");
+	printf("\t\t      |====                  ====|\n");
+	printf("\t\t            <<== <(^_^)> ==>>\n\n");
+	
+	printf("        =====================================================================\n");
+	printf("       ||                                                                   ||\n");
+	printf("       ||  TERIMA KASIH KEPADA PEMAIN KARENA TELAH MEMAINKAN PERMAINAN INI  ||\n");
+	printf("       ||                                                                   ||\n");
+	printf("        =====================================================================\n");
+}
+
 void WinnerUI(char winner[], int timeConsume)
 {
 	system("CLS");
@@ -274,7 +291,7 @@ void WinnerUI(char winner[], int timeConsume)
 	printf("\t\t      |====                  ====|\n");
 	printf("\t\t      |         Gameover         |\n");
 	printf("\t\t      |====                  ====|\n");
-	printf("\t\t            <<== winner ==>>\n\n");
+	printf("\t\t            <<== Winner ==>>\n\n");
 	
 	printf("       =========================================================\n");
 	printf("                              %s                        \n", winner);
