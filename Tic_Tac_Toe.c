@@ -29,6 +29,7 @@ typedef struct
 	char name[20];
 	int duration;
 	int boardSize;
+	char level[20];
 }HighscoreData;
 
 HighscoreData data, listData[100], tempData; // highscore data
@@ -56,10 +57,10 @@ void DrawBoard(char **board, int boardSize);
 void MainMenu();
 void HowToPlay();
 void GameMode(int *gameMode);
-void Leveling (int *waktu);
+void Leveling (int *waktu, char level[20]);
 void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
-void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize);
+void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize, char level[20]);
 char** CreateBoard(int boardSize);
 int StreakRule(int boardSize);
 int CheckStreak(char temp[], int boardSize, int numStreak);
@@ -82,7 +83,7 @@ void PlayMusic(int list);
 
 /* Modul Highscore */
 void Highscores();
-void WriteData(char winner[15], int duration, int boardSize);
+void WriteData(char winner[15], int duration, int boardSize, char level[20]);
 int ReadData();
 void SwapData(int x, int y);
 void SortHighscores(int criteria, int amount);
@@ -96,8 +97,8 @@ int SortCriteria(int i, int k, int criteria);
 int main()
 {
 	// Deklarasi
-	char **board;
-	int boardSize, currentPlayer, isWin, maxRound, roundPlayed, opponent, gameMode, Level, isExit, timeConsume;
+	char **board, level[20];
+	int boardSize, currentPlayer, isWin, maxRound, roundPlayed, opponent, gameMode, waktu, isExit, timeConsume;
 	PlayerName playerName;
 	clock_t elapsedTime;
 	
@@ -120,8 +121,8 @@ int main()
 			ChooseOpponent(&opponent);
 			
 		//Menampilkan pilihan level
-		Leveling(&Level);
-		
+		Leveling(&waktu, &level[20]);
+
 		// Menginputkan nama pemain
 		InputName(&playerName, gameMode);
 		
@@ -144,7 +145,7 @@ int main()
 			isWin = CheckWin(board, boardSize);
 			if(isWin > 0)
 				break;
-			MakeMove(board, boardSize, &currentPlayer, gameMode, opponent, Level);
+			MakeMove(board, boardSize, &currentPlayer, gameMode, opponent, waktu);
 			roundPlayed++;
 		}
 		// --- Game Over ---
@@ -157,10 +158,10 @@ int main()
 		PlayMusic(2);
 		
 		DrawBoard(board, boardSize);
-		printf("Game Over, press any key to continue : ");getch();
+		printf("Game Over, press any key to continue <(^_^)> : ");getch();
 
 		// Menampilkan tampilan Game Over
-		GameOver(currentPlayer, playerName, roundPlayed, maxRound, timeConsume, boardSize);
+		GameOver(currentPlayer, playerName, roundPlayed, maxRound, timeConsume, boardSize, level);
 		
 		// Menghapus papan saat ini
 		DeleteBoard(board, boardSize);
@@ -213,7 +214,7 @@ void LevelingUI()
 		system("CLS");
 	printf("\t      <<============>>\n");
 	printf("\t|====                 ====|\n");
-	printf("\t|           Level         |\n");
+	printf("\t|          Level          |\n");
 	printf("\t|====                 ====|\n");
 	printf("\t      <<== Choose ==>>\n\n");
 	
@@ -449,11 +450,11 @@ void HowToPlay()
 			printf("%c", c);
 		}
 	
-		printf("\n\nPress Any Key to Continue..."); getch();
+		printf("\n\nPress Any Key to Continue <(^_^)>"); getch();
 	
 		fclose(fp);
 	}else if(fp == NULL)
-		printf("Unable To Create the file\n\n\n");
+		printf("Unable To Create the file <(^_^)>\n\n\n");
 }
 
 void GameMode(int *gameMode)
@@ -465,7 +466,7 @@ void GameMode(int *gameMode)
 	}while(*gameMode != 1 && *gameMode != 2);
 }
 
-void Leveling(int *waktu)
+void Leveling(int *waktu, char level[20])
 {
 	do
 	{
@@ -473,9 +474,9 @@ void Leveling(int *waktu)
 		*waktu = getch ()- '0';
 		switch (*waktu)
 		{
-			case 1: *waktu =15; break;
-			case 2: *waktu =10; break;
-			case 3: *waktu =5; break;
+			case 1: *waktu =15; strcpy (level, "easy"); break;
+			case 2: *waktu =10; strcpy (level, "medium"); break;
+			case 3: *waktu =5; strcpy (level, "hard"); break;
 		}
 	} while (*waktu != 15 && *waktu != 10 && *waktu != 5);
 }
@@ -505,7 +506,7 @@ void ChooseBoard(int *boardSize)
 	}while(*boardSize == 0);
 }
 
-void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize)
+void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize, char level[20])
 {
 	char winner[NameLength];
 	int choice;
@@ -528,7 +529,7 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 	
 	// Menulis data ke file higscore
 	if(isWin == 1)
-		WriteData(winner, timeConsume, boardSize);
+		WriteData(winner, timeConsume, boardSize, level);
 	
 	do
 	{
@@ -965,13 +966,13 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 		if(isValid == 0)
 		{
 			DrawBoard(board, boardSize);
-			printf("Inputan tidak valid, harap masukan kembali.\n\n");
+			printf("Inputan tidak valid, harap masukan kembali <(^_^)> \n\n");
 		}
 		printf("Giliran player %d. \n", *currentPlayer);
-		printf("Masukan baris : "); playerMove->row = InputWithTime(waktu) - '0'; 
+		printf("Masukan baris <(^_^)> : "); playerMove->row = InputWithTime(waktu) - '0'; 
 		if(playerMove->row >= 0 && playerMove->row < boardSize) 
 			printf("%d", playerMove->row);
-		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(waktu) - '0';
+		printf("\nMasukan kolom <(^_^)> : "); playerMove->col = InputWithTime(waktu) - '0';
 		if(playerMove->row >= 0 && playerMove->col < boardSize) 
 			printf("%d", playerMove->col);
 		
@@ -995,8 +996,6 @@ void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer
 	{
 		RandomBasedPlayer(board, computerMove, boardSize);
 	}
-	
-	
 }
 
 void RandomBasedBoard(char **board, MoveFormat *computerMove,int boardSize)
@@ -1134,10 +1133,10 @@ void InputName(PlayerName *playerName, int gameMode)
 	{
 		InputNameUI();
 		if(inputLen < 5 || inputLen > NameLength)
-			printf("Masukan minimal 4 karakter dan maximal 12 karakter\n");
+			printf("Masukan minimal 4 karakter dan maximal 12 karakter <(^_^)> \n");
 
 		fflush(stdin); // membersihkan inputan sebelumnnya
-		printf("Masukan Nama Player 1 : ");
+		printf("Masukan Nama Player 1 <(^_^)> : ");
 		fgets(buffer, 255, stdin);	
 		inputLen = strlen(buffer); // menghitung panjang inputan
 		buffer[inputLen - 1] = '\0'; // mengambil default \n dari fgets
@@ -1151,10 +1150,10 @@ void InputName(PlayerName *playerName, int gameMode)
 		{
 			InputNameUI();
 			if(inputLen < 5 || inputLen > NameLength)
-				printf("Masukan minimal 4 karakter dan maximal 12 karakter\n");
+				printf("Masukan minimal 4 karakter dan maximal 12 karakter <(^_^)> \n");
 	
 			fflush(stdin); // membersihkan inputan sebelumnnya
-			printf("Masukan Nama Player 2 : ");
+			printf("Masukan Nama Player 2 <(^_^)> : ");
 			fgets(buffer, 255, stdin);	
 			inputLen = strlen(buffer); // menghitung panjang inputan
 			buffer[inputLen - 1] = '\0'; // mengambil default \n dari fgets
@@ -1219,11 +1218,12 @@ void Highscores()
 		if(criteria < 1 || criteria > 4)
 		{
 			criteria = 1;
-			printf("[Masukan Inputan yang valid]\n\n");
+			printf("[Masukan Inputan yang valid] <(^_^)> \n\n");
 		}
 		
 		SortHighscores(criteria, amount);
-		printf("Nama Pemain\t\tDurasi Permainan(detik)\t\tUkuran Papan\n");
+		printf("Nama Pemain\t\tDurasi Permainan(detik)\t\tUkuran Papan\t\tLevel\n");
+		printf("=======================================================================================\n");
 		for(i = 0; i < amount; i++)
 		{
 			printf("%-20s", listData[i].name);
@@ -1231,18 +1231,21 @@ void Highscores()
 			printf("%d", listData[i].duration);
 			printf("\t\t\t     ");
 			printf("%d\n", listData[i].boardSize);
+			printf("\t\t\t     ");
+			printf("%s", listData[i].level);
 		}
-		printf("\nsort berdasarkan : ");
+		printf("\nsort berdasarkan <(^_^)> : ");
 		criteria = getch() - '0';
 	}while(criteria != 4);
 }
 
-void WriteData(char winner[15], int duration, int boardSize)
+void WriteData(char winner[15], int duration, int boardSize, char level[20])
 {
 	// Mengisikan data ke highscore
 	strcpy(data.name, winner);
 	data.duration = duration;
 	data.boardSize = boardSize;
+	strcpy(data.level, level);
 	
 	// mengisikan data ke file highscores
 	FILE *fp = fopen(HIGHSCORE_FILENAME, "ab"); 
