@@ -56,7 +56,7 @@ void DrawBoard(char **board, int boardSize);
 void MainMenu();
 void HowToPlay();
 void GameMode(int *gameMode);
-void Leveling (int *Level);
+void Leveling (int *waktu);
 void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
 void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize);
@@ -68,9 +68,9 @@ int CheckVertical(char **board, int boardSize);
 int CheckMainDiagonal(char **board, int boardSize);
 int CheckSecDiagonal(char **board, int boardSize);
 int CheckWin(char **board, int boardSize);
-void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent, int Level);
+void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent, int waktu);
 int InputWithTime(unsigned int timeout);
-void GetUserInput(char **board, MoveFormat *playerMove,  int *currentPlayer, int boardSize, int Level);
+void GetUserInput(char **board, MoveFormat *playerMove,  int *currentPlayer, int boardSize, int waktu);
 void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize, int opponent);
 void RandomBasedBoard(char **board, MoveFormat *computerMove,int boardSize);
 void RandomBasedPlayer(char **board, MoveFormat *move,int boardSize);
@@ -465,20 +465,19 @@ void GameMode(int *gameMode)
 	}while(*gameMode != 1 && *gameMode != 2);
 }
 
-void Leveling(int *Level)
+void Leveling(int *waktu)
 {
-	int waktu;
 	do
 	{
 		LevelingUI();
-		*Level = getch ()- '0';
-		switch (*Level)
+		*waktu = getch ()- '0';
+		switch (*waktu)
 		{
-			case 1: *Level =15; break;
-			case 2: *Level =10; break;
-			case 3: *Level =5; break;
+			case 1: *waktu =15; break;
+			case 2: *waktu =10; break;
+			case 3: *waktu =5; break;
 		}
-	} while (*Level != 15 && *Level != 10 && *Level != 5);
+	} while (*waktu != 15 && *waktu != 10 && *waktu != 5);
 }
 
 void ChooseOpponent(int *opponent)
@@ -922,19 +921,19 @@ int CheckWin(char **board, int boardSize)
 }
 
 /* Melakukan Pergerakan di papan */
-void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent, int Level)
+void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent, int waktu)
 {
 	/* Get Input */
 	MoveFormat Move;
 	
 	if(gameMode == 1)
 	{
-		GetUserInput(board, &Move, currentPlayer, boardSize, Level);
+		GetUserInput(board, &Move, currentPlayer, boardSize, waktu);
 	}
 	else if(gameMode == 2)
 	{
 		if(*currentPlayer == 1)
-			GetUserInput(board, &Move, currentPlayer, boardSize, Level);
+			GetUserInput(board, &Move, currentPlayer, boardSize, waktu);
 		else if(*currentPlayer == 2)
 			GetComputerInput(board, &Move, currentPlayer, boardSize, opponent);	
 	}
@@ -958,7 +957,7 @@ int InputWithTime(unsigned int timeout)
     return -1;
 }
 
-void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int boardSize, int Level)
+void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int boardSize, int waktu)
 {
 	int isValid = 1;
 	do
@@ -969,10 +968,10 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 			printf("Inputan tidak valid, harap masukan kembali.\n\n");
 		}
 		printf("Giliran player %d. \n", *currentPlayer);
-		printf("Masukan baris : "); playerMove->row = InputWithTime(Level) - '0'; 
+		printf("Masukan baris : "); playerMove->row = InputWithTime(waktu) - '0'; 
 		if(playerMove->row >= 0 && playerMove->row < boardSize) 
 			printf("%d", playerMove->row);
-		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(Level) - '0';
+		printf("\nMasukan kolom : "); playerMove->col = InputWithTime(waktu) - '0';
 		if(playerMove->row >= 0 && playerMove->col < boardSize) 
 			printf("%d", playerMove->col);
 		
