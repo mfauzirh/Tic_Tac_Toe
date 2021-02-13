@@ -219,9 +219,9 @@ void LevelingUI()
 	printf("\t      <<== Choose ==>>\n\n");
 	
 	printf("       ============================\n");
-	printf("      ||[1] Easy                  ||\n");
-	printf("      ||[2] Medium                ||\n");
-	printf("      ||[3] Hard                  ||\n");
+	printf("      ||[1] Beginner              ||\n");
+	printf("      ||[2] Competent             ||\n");
+	printf("      ||[3] Expert                ||\n");
 	printf("       ============================\n");
 	printf("\nYour Choice <(^_^)> : ");
 }
@@ -474,9 +474,9 @@ void Leveling(int *waktu, char *level)
 		*waktu = getch ()- '0';
 		switch (*waktu)
 		{
-			case 1: *waktu =15; strcpy (level, "easy"); break;
-			case 2: *waktu =10; strcpy (level, "medium"); break;
-			case 3: *waktu =5; strcpy (level, "hard"); break;
+			case 1: *waktu =15; strcpy (level, "beginner"); break;
+			case 2: *waktu =10; strcpy (level, "competent"); break;
+			case 3: *waktu =5; strcpy (level, "expert"); break;
 		}
 	} while (*waktu != 15 && *waktu != 10 && *waktu != 5);
 }
@@ -1212,10 +1212,11 @@ void Highscores()
 		printf("\t|| Ketik [1] untuk mengurutkan berdasarkan durasi       ||\n");
 		printf("\t|| Ketik [2] untuk mengurutkan berdasarkan ukuran papan ||\n");
 		printf("\t|| Ketik [3] untuk mengurutkan berdasarkan nama         ||\n");
-		printf("\t|| Ketik [4] untuk kembali ke main menu                 ||\n");
+		printf("\t|| Ketik [4] untuk mengurutkan berdasarkan level        ||\n");
+		printf("\t|| Ketik [5] untuk kembali ke main menu                 ||\n");
 		printf("\t ========================================================\n\n\n");
 		
-		if(criteria < 1 || criteria > 4)
+		if(criteria < 1 || criteria > 5)
 		{
 			criteria = 1;
 			printf("[Masukan Inputan yang valid] <(^_^)> \n\n");
@@ -1236,7 +1237,7 @@ void Highscores()
 		}
 		printf("\nsort berdasarkan <(^_^)> : ");
 		criteria = getch() - '0';
-	}while(criteria != 4);
+	}while(criteria != 5);
 }
 
 void WriteData(char winner[15], int duration, int boardSize, char level[20])
@@ -1282,7 +1283,12 @@ int SortCriteria(int i, int j, int criteria)
 	{
 		// mengurutkan berdasarkan nama
 		return strcmp(listData[j].name, listData[i].name) < 0;
+	}else if(criteria == 4)
+	{
+		// mengurutkan berdasarkan level
+		return strcmp(listData[j].level, listData[i].level) > 0;
 	}
+	
 }
 
 void SortHighscores(int criteria, int amount)
