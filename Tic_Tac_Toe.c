@@ -296,7 +296,7 @@ void WinnerUI(char winner[], int timeConsume)
 	
 	printf("       =========================================================\n");
 	printf("                              %s                        \n", winner);
-	printf("            Memenangkan permainan dengan waktu %d detik ++>\n", timeConsume);
+	printf("            Memenangkan permainan dengan waktu %d detik \n", timeConsume);
 	printf("       =========================================================\n");
 	
 	printf("       ================================\n");
