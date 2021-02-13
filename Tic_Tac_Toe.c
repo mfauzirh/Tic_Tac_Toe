@@ -245,21 +245,21 @@ void ChooseOpponentUI()
 void InputNameUI()
 {
 	system("CLS");
-	printf("\t     <<=================>>\n");
+	printf("\t     <<==================>>\n");
 	printf("\t|====                      ====|\n");
 	printf("\t|      Game Configuration      |\n");
 	printf("\t|====                      ====|\n");
-	printf("\t      <<== Only 12 char ==>>\n\n");
+	printf("\t     <<== Only 12 char ==>>\n\n");
 }
 
 void ChooseBoardUI()
 {
 	system("CLS");
-	printf("\t        <<============>>\n");
+	printf("\t     <<================>>\n");
 	printf("\t|====                     ====|\n");
 	printf("\t|      Choose Board Size      |\n");
 	printf("\t|====                     ====|\n");
-	printf("\t         <<== Choose ==>>\n\n");
+	printf("\t     <<==== Choose ====>>\n\n");
 	
 	printf("            ========================\n");
 	printf("           ||Press '1' For 3x3 Size||\n");
@@ -329,11 +329,17 @@ void TieUI()
 void Draw3x3Board(char**board)
 {
     system("cls");
-    printf("\n\n\tTic Tac Toe\n\n");
-    printf("Player 1 (X) -- Player 2 (O)\n\n");
+    printf("                  =======  \n");
+    printf("            ======       ======\n");
+    printf("     =======                   =======\n");
+    printf("    ||          Tic Tac Toe          ||\n");
+    printf("    ||  Player 1 (X) -- Player 2 (O) ||\n");
+    printf("     =======                   =======\n");
+    printf("            ======       ======\n");
+    printf("                  =======\n");
     printf("   0     1     2  \n");
     printf(" _________________\n");
-    printf("|     |     |     |\n");
+    printf("|     |     |     |\n1");
     printf("|  %c  |  %c  |  %c  | 0\n",board[0][0],board[0][1],board[0][2]);
     printf("|_____|_____|_____|\n");
     printf("|     |     |     |\n");
@@ -349,8 +355,14 @@ void Draw3x3Board(char**board)
 void Draw5x5Board(char**board)
 {
     system("cls");
-    printf("\n\n\tTic Tac Toe\n\n");
-    printf("Player 1 (X) -- Player 2 (O)\n\n");
+    printf("                  =======  \n");
+    printf("            ======       ======\n");
+    printf("     =======                   =======\n");
+    printf("    ||          Tic Tac Toe          ||\n");
+    printf("    ||  Player 1 (X) -- Player 2 (O) ||\n");
+    printf("     =======                   =======\n");
+    printf("            ======       ======\n");
+    printf("                  =======\n");
     printf("   0     1     2     3     4  \n");
     printf(" _____________________________\n");
     printf("|     |     |     |     |     |\n");
@@ -375,8 +387,14 @@ void Draw5x5Board(char**board)
 void Draw7x7Board(char**board)
 {
     system("cls");
-    printf("\n\n\tTic Tac Toe\n\n");
-    printf("Player 1 (X) -- Player 2 (O)\n\n");
+    printf("                  =======  \n");
+    printf("            ======       ======\n");
+    printf("     =======                   =======\n");
+    printf("    ||          Tic Tac Toe          ||\n");
+    printf("    ||  Player 1 (X) -- Player 2 (O) ||\n");
+    printf("     =======                   =======\n");
+    printf("            ======       ======\n");
+    printf("                  =======\n");
     printf("   0     1     2     3     4     5     6  \n");
     printf(" _________________________________________\n");
     printf("|     |     |     |     |     |     |     |\n");
