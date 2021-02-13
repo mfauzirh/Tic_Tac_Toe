@@ -57,7 +57,7 @@ void DrawBoard(char **board, int boardSize);
 void MainMenu();
 void HowToPlay();
 void GameMode(int *gameMode);
-void Leveling (int *waktu, char level[20]);
+void Leveling (int *waktu, char *level);
 void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
 void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize, char level[20]);
@@ -121,7 +121,7 @@ int main()
 			ChooseOpponent(&opponent);
 			
 		//Menampilkan pilihan level
-		Leveling(&waktu, &level[20]);
+		Leveling(&waktu, level);
 
 		// Menginputkan nama pemain
 		InputName(&playerName, gameMode);
@@ -466,7 +466,7 @@ void GameMode(int *gameMode)
 	}while(*gameMode != 1 && *gameMode != 2);
 }
 
-void Leveling(int *waktu, char level[20])
+void Leveling(int *waktu, char *level)
 {
 	do
 	{
@@ -1230,9 +1230,9 @@ void Highscores()
 			printf("\t\t  ");
 			printf("%d", listData[i].duration);
 			printf("\t\t\t     ");
-			printf("%d\n", listData[i].boardSize);
-			printf("\t\t\t     ");
-			printf("%s", listData[i].level);
+			printf("%d", listData[i].boardSize);
+			printf("\t\t\t");
+			printf("%-10s\n", listData[i].level);
 		}
 		printf("\nsort berdasarkan <(^_^)> : ");
 		criteria = getch() - '0';
