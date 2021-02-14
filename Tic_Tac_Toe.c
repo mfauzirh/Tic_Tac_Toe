@@ -81,6 +81,7 @@ void InputName(PlayerName *playerName, int gameMode);
 void DeleteBoard(char **board, int boardSize);
 void PlayMusic(int list);
 MoveFormat GetWinningMove(char **board, int boardSize);
+MoveFormat GetBlockMove(char **board, int boardSize);
 
 /* Modul Highscore */
 void Highscores();
@@ -1036,6 +1037,36 @@ MoveFormat GetWinningMove(char **board, int boardSize)
 	return winningMove;
 }
 
+MoveFormat GetBlockMove(char **board, int boardSize)
+{
+	int i, j;
+	MoveFormat blockMove;
+	blockMove.row = -1;
+	blockMove.col = -1;
+	
+	for(i = 0; i < boardSize; i++)
+	{
+		for(j = 0; j < boardSize; j++)
+		{
+			if(board[i][j] == ' ')
+			{
+				board[i][j] = 'X';
+				
+				if(CheckWin(board, boardSize) == 1)
+				{
+					blockMove.row = i;
+					blockMove.col = j;
+					board[i][j] = ' ';
+					return blockMove;
+				}
+				
+				board[i][j] = ' ';
+			}
+		}
+	}
+	return blockMove;
+}
+
 void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize, int opponent)
 {	
 	if(opponent == 1)
@@ -1054,12 +1085,17 @@ void RandomBasedBoard(char **board, MoveFormat *computerMove,int boardSize)
 	int currentIdx = 0;
 	int randMove;
 	int winMove = 0;
+	int blockMove = 0;
 	
 	*computerMove = GetWinningMove(board, boardSize);
 	if(computerMove->row != -1)
 		winMove = 1;
 	
-	if(winMove == 0)
+	*computerMove = GetBlockMove(board, boardSize);
+	if(computerMove->row != -1)
+		blockMove = 1;
+	
+	if(winMove == 0 && blockMove == 0)
 	{
 		// check kotak kosong tersedia
 		for(row = 0; row < boardSize; row++)
