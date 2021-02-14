@@ -80,6 +80,7 @@ void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer)
 void InputName(PlayerName *playerName, int gameMode);
 void DeleteBoard(char **board, int boardSize);
 void PlayMusic(int list);
+MoveFormat GetWinningMove(char **board, int boardSize);
 
 /* Modul Highscore */
 void Highscores();
@@ -1005,6 +1006,36 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 	}while(isValid == 0);
 }
 
+MoveFormat GetWinningMove(char **board, int boardSize)
+{
+	int i, j;
+	MoveFormat winningMove;
+	winningMove.row = -1;
+	winningMove.col = -1;
+	
+	for(i = 0; i < boardSize; i++)
+	{
+		for(j = 0; j < boardSize; j++)
+		{
+			if(board[i][j] == ' ')
+			{
+				board[i][j] = 'O';
+				
+				if(CheckWin(board, boardSize) == 1)
+				{
+					winningMove.row = i;
+					winningMove.col = j;
+					board[i][j] = ' ';
+					return winningMove;
+				}
+				
+				board[i][j] = ' ';
+			}
+		}
+	}
+	return winningMove;
+}
+
 void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize, int opponent)
 {	
 	if(opponent == 1)
@@ -1022,29 +1053,37 @@ void RandomBasedBoard(char **board, MoveFormat *computerMove,int boardSize)
 	int moveAvailable[boardSize*boardSize][2];
 	int currentIdx = 0;
 	int randMove;
+	int winMove = 0;
 	
-	// check kotak kosong tersedia
-	for(row = 0; row < boardSize; row++)
+	*computerMove = GetWinningMove(board, boardSize);
+	if(computerMove->row != -1)
+		winMove = 1;
+	
+	if(winMove == 0)
 	{
-		for(col = 0; col < boardSize; col++)
+		// check kotak kosong tersedia
+		for(row = 0; row < boardSize; row++)
 		{
-			if(board[row][col] == ' ')
+			for(col = 0; col < boardSize; col++)
 			{
-				// kumpulkan kotak tersedia
-				moveAvailable[currentIdx][0] = row;
-				moveAvailable[currentIdx][1] = col;
-				currentIdx++;
+				if(board[row][col] == ' ')
+				{
+					// kumpulkan kotak tersedia
+					moveAvailable[currentIdx][0] = row;
+					moveAvailable[currentIdx][1] = col;
+					currentIdx++;
+				}
 			}
 		}
+		
+		srand(time(NULL));
+		// Memilih secara acak kotak yang ingin di isi dari kotak kosong yang tersedia
+		randMove = rand() % currentIdx;
+		
+		// mengisi kotak kosong dengan langkah yang telah di generate
+		computerMove->row = moveAvailable[randMove][0];
+		computerMove->col = moveAvailable[randMove][1];
 	}
-	
-	srand(time(NULL));
-	// Memilih secara acak kotak yang ingin di isi dari kotak kosong yang tersedia
-	randMove = rand() % currentIdx;
-	
-	// mengisi kotak kosong dengan langkah yang telah di generate
-	computerMove->row = moveAvailable[randMove][0];
-	computerMove->col = moveAvailable[randMove][1];
 }
 
 void RandomBasedPlayer(char **board, MoveFormat *move,int boardSize)
