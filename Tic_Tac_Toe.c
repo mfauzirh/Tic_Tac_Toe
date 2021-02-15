@@ -16,13 +16,13 @@ typedef struct
 {
 	int row;
 	int col;
-} MoveFormat;
+} MoveFormat; // UDT for move Format
 
 typedef struct
 {
 	char NameP1[255];
 	char NameP2[255];
-} PlayerName;
+} PlayerName; // UDT for player data
 
 typedef struct
 {
@@ -30,9 +30,9 @@ typedef struct
 	int duration;
 	int boardSize;
 	char level[20];
-}HighscoreData;
+}HighscoreData; // UDT for Highscore data
 
-HighscoreData data, listData[100], tempData; // highscore data
+HighscoreData data, listData[100], tempData; // highscore data [global Variabel]
 
 /* =====================================*/
 /*				Deklarasi Modul			*/
@@ -54,6 +54,8 @@ void Draw7x7Board(char**);
 void DrawBoard(char **board, int boardSize);
 
 /* Modul Logika */
+
+// Navigation
 void MainMenu();
 void HowToPlay();
 void GameMode(int *gameMode);
@@ -61,7 +63,12 @@ void Leveling (int *waktu, char *level);
 void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
 void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize, char level[20]);
+
+// Board Modul
 char** CreateBoard(int boardSize);
+void DeleteBoard(char **board, int boardSize);
+
+// Win logic
 int StreakRule(int boardSize);
 int CheckStreak(char temp[], int boardSize, int numStreak);
 int CheckHorizontal(char **board, int boardSize);
@@ -69,27 +76,35 @@ int CheckVertical(char **board, int boardSize);
 int CheckMainDiagonal(char **board, int boardSize);
 int CheckSecDiagonal(char **board, int boardSize);
 int CheckWin(char **board, int boardSize);
+
+// Make Move in board
 void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent, int waktu);
-int InputWithTime(unsigned int timeout);
+void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer);
+
+// Get User Input
 void GetUserInput(char **board, MoveFormat *playerMove,  int *currentPlayer, int boardSize, int waktu);
+int InputWithTime(unsigned int timeout);
+int isValidInput(char **board, MoveFormat *playerMove, int BoardSize);
+
+// Generate AI input
 void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize, int opponent);
 void RandomBasedBoard(char **board, MoveFormat *computerMove,int boardSize);
 void RandomBasedPlayer(char **board, MoveFormat *move,int boardSize);
 void RandomSmartMove(char **board, MoveFormat *move,int boardSize);
-int isValidInput(char **board, MoveFormat *playerMove, int BoardSize);
-void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer);
-void InputName(PlayerName *playerName, int gameMode);
-void DeleteBoard(char **board, int boardSize);
-void PlayMusic(int list);
 MoveFormat GetWinningMove(char **board, int boardSize);
 MoveFormat GetBlockMove(char **board, int boardSize);
 
-/* Modul Highscore */
+// Player Config & other
+void InputName(PlayerName *playerName, int gameMode);
+void PlayMusic(int list);
+
+
+/* Modul Highscore */ // Adaptation from Author Imam Saiful
 void Highscores();
 void WriteData(char winner[15], int duration, int boardSize, char level[20]);
-int ReadData();
 void SwapData(int x, int y);
 void SortHighscores(int criteria, int amount);
+int ReadData();
 int SortCriteria(int i, int k, int criteria);
 
 /* =====================================*/
@@ -443,6 +458,7 @@ void DrawBoard(char **board, int boardSize)
 
 void MainMenu()
 {
+	// Modul Navigasi Main menu
 	int choice;
 	do
 	{
@@ -460,6 +476,7 @@ void MainMenu()
 
 void HowToPlay()
 {
+	// Modul untuk menampilkan tampilan how to play dengan membaca file
 	system("cls");
 	FILE *fp = fopen(HOW_TO_PLAY, "r");
 	char c;
@@ -535,7 +552,7 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 	int isWin;
 	int i;
 	
-	if(roundPlayed != maxRound)
+	if(roundPlayed != maxRound) // jika ada pemenang
 	{
 		if(currentPlayer == 1)
 			strcpy(winner, playerName.NameP2);
@@ -546,7 +563,7 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 			winner[i] = tolower(winner[i]);
 		
 		isWin = 1;
-	}else if(roundPlayed == maxRound)
+	}else if(roundPlayed == maxRound) // jika tidak ada pemenang
 		isWin = 0;
 	
 	// Menulis data ke file higscore
@@ -555,6 +572,7 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 	
 	do
 	{
+		// Navigasi game over
 		if(isWin == 1)
 			WinnerUI(winner, timeConsume);
 		else if(isWin == 0)
@@ -586,12 +604,12 @@ char** CreateBoard(int boardSize)
 		}
 	}
 	
-	return board;
+	return board; // mengembalikan papan yang telah dialokasikan memory
 }
 
-/* modul untuk menentukan syarat streak */
 int StreakRule(int boardSize)
 {
+	// Moduk untuk menenentukan syarat streak
 	int numberToStreak;
 	if(boardSize == 3)
 		numberToStreak = boardSize - 1;
@@ -600,7 +618,7 @@ int StreakRule(int boardSize)
 	else if(boardSize == 7)
 		numberToStreak = boardSize - 2;
 	
-	return numberToStreak;
+	return numberToStreak; // mengembalikan syarat streak
 }
 
 int CheckStreak(char board[], int lineSize, int numStreak)
@@ -694,16 +712,16 @@ int CheckHorizontal(char **board, int boardSize)
 	
 	for(i = 0; i < boardSize; i++)
 	{
-		for(j = 0; j < boardSize; j++)
-			temp[j] = board[i][j];
+		for(j = 0; j < boardSize; j++) // mengisi pola horizontal baris ke-i
+			temp[j] = board[i][j]; 
 		
-		if(CheckStreak(temp, boardSize, StreakRule(boardSize)) == 1)
+		if(CheckStreak(temp, boardSize, StreakRule(boardSize)) == 1) // mengirim pola horizontal baris ke-i untuk di cek
 		{
-			return 1;
+			return 1; // jika terbentuk streak
 		}
 	}
 	
-	return 0;
+	return 0; // jika tidak
 }
 
 /* Modul untuk memeriksa kemenangan secara vertical */
@@ -714,21 +732,22 @@ int CheckVertical(char **board, int boardSize)
 	
 	for(i = 0; i < boardSize; i++)
 	{
-		for(j = 0; j < boardSize; j++)
+		for(j = 0; j < boardSize; j++) // mengisi pola vertical baris ke-i
 			temp[j] = board[j][i];
 		
-		if(CheckStreak(temp, boardSize, StreakRule(boardSize)) == 1)
+		if(CheckStreak(temp, boardSize, StreakRule(boardSize)) == 1) // mengirim pola vertical baris ke-i untuk di cek
 		{
-			return 1;
+			return 1; // jika terbentuk streak
 		}
 	}
 	
-	return 0;
+	return 0; // jika tidak
 }
 
 /* Memeriksa kemengangan di diagonal Utama */
 int CheckMainDiagonal(char **board, int boardSize)
 {
+	// asumsi acuan diagonal ke-0 pada main diagonal untuk mengecek diagonal berikutnya
 	int i, j, k;
 	char temp[boardSize];
 	
@@ -831,6 +850,7 @@ int CheckMainDiagonal(char **board, int boardSize)
 /* Memeriksa kemenangan di diagonal sekunder */
 int CheckSecDiagonal(char **board, int boardSize)
 {
+	// asumsi acuan diagonal ke-0 pada secondary diagonal untuk mengecek diagonal berikutnya
 	int i, j, k;
 	char temp[boardSize];
 	
@@ -943,17 +963,18 @@ int CheckWin(char **board, int boardSize)
 		return 0;
 }
 
-/* Melakukan Pergerakan di papan */
 void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent, int waktu)
 {
+	// Modul untuk melakukan pergerakan di papan
+	
 	/* Get Input */
 	MoveFormat Move;
 	
-	if(gameMode == 1)
+	if(gameMode == 1) // jika PvP
 	{
 		GetUserInput(board, &Move, currentPlayer, boardSize, waktu);
 	}
-	else if(gameMode == 2)
+	else if(gameMode == 2) // Jika PvE
 	{
 		if(*currentPlayer == 1)
 			GetUserInput(board, &Move, currentPlayer, boardSize, waktu);
@@ -1001,7 +1022,7 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 		if(playerMove->row == -49 || playerMove->col == -49)
 		{
 			GetComputerInput(board, playerMove, currentPlayer, boardSize, 1);
-			PlayMusic(1); // 1 for skip sound
+			PlayMusic(1); // playing skip sound
 		}
 			
 			
@@ -1011,6 +1032,7 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 
 MoveFormat GetWinningMove(char **board, int boardSize)
 {
+	// mencek semua kemungkinan gerakan kemenangan pada papan
 	int i, j;
 	MoveFormat winningMove;
 	winningMove.row = -1;
@@ -1024,12 +1046,12 @@ MoveFormat GetWinningMove(char **board, int boardSize)
 			{
 				board[i][j] = 'O';
 				
-				if(CheckWin(board, boardSize) == 1)
+				if(CheckWin(board, boardSize) == 1) // jika ada gerakan kemenangan
 				{
 					winningMove.row = i;
 					winningMove.col = j;
 					board[i][j] = ' ';
-					return winningMove;
+					return winningMove; // mengembalikan gerakan kemenangan
 				}
 				
 				board[i][j] = ' ';
@@ -1041,6 +1063,7 @@ MoveFormat GetWinningMove(char **board, int boardSize)
 
 MoveFormat GetBlockMove(char **board, int boardSize)
 {
+	// mencari kemungkinan gerakan untuk mencegah player menang
 	int i, j;
 	MoveFormat blockMove;
 	blockMove.row = -1;
@@ -1054,7 +1077,7 @@ MoveFormat GetBlockMove(char **board, int boardSize)
 			{
 				board[i][j] = 'X';
 				
-				if(CheckWin(board, boardSize) == 1)
+				if(CheckWin(board, boardSize) == 1) // jika ada block move
 				{
 					blockMove.row = i;
 					blockMove.col = j;
@@ -1071,11 +1094,11 @@ MoveFormat GetBlockMove(char **board, int boardSize)
 
 void GetComputerInput(char **board, MoveFormat *computerMove, int *currentPlayer, int boardSize, int opponent)
 {	
-	if(opponent == 1)
+	if(opponent == 1) // vs. Randomizer
 		RandomBasedBoard(board, computerMove, boardSize);
-	else if(opponent == 2)
+	else if(opponent == 2) // vs. Stalker
 		RandomBasedPlayer(board, computerMove, boardSize);
-	else if(opponent == 3)
+	else if(opponent == 3) // vs. Thinker
 		RandomSmartMove(board, computerMove, boardSize);
 }
 
@@ -1192,14 +1215,17 @@ void RandomSmartMove(char **board, MoveFormat *computerMove,int boardSize)
 {
 	int winMove = 0, blockMove = 0;
 	
+	// mencari gerakan kemenangan
 	*computerMove = GetWinningMove(board, boardSize);
 	if(computerMove->row != -1)
 		winMove = 1;
 	
+	// mencari gerakan untuk mencegah kemenangan player
 	*computerMove = GetBlockMove(board, boardSize);
 	if(computerMove->row != -1)
 		blockMove = 1;
 	
+	// jika tidak ada gunakan random move
 	if(winMove == 0 && blockMove == 0)
 		RandomBasedBoard(board, computerMove, boardSize);
 }
@@ -1219,6 +1245,7 @@ int isValidInput(char **board, MoveFormat *playerMove, int boardSize)
 
 void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer)
 {
+	// Melukis simbol dipapan berdasarkan gerakan yang telah di dapat
 	if(Move.row < boardSize && Move.col < boardSize && board[Move.row][Move.col] == ' ')
 	{
 		if(*currentPlayer == 1)
