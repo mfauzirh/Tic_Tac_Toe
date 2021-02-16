@@ -62,7 +62,7 @@ void GameMode(int *gameMode);
 void Leveling (int *waktu, char *level);
 void ChooseOpponent(int *opponent);
 void ChooseBoard(int *boardSize);
-void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize, char level[20]);
+void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize, char level[20], int isWin);
 
 // Board Modul
 char** CreateBoard(int boardSize);
@@ -160,10 +160,10 @@ int main()
 		while(roundPlayed != maxRound)
 		{
 			DrawBoard(board, boardSize);
+			MakeMove(board, boardSize, &currentPlayer, gameMode, opponent, waktu);
 			isWin = CheckWin(board, boardSize);
 			if(isWin > 0)
 				break;
-			MakeMove(board, boardSize, &currentPlayer, gameMode, opponent, waktu);
 			roundPlayed++;
 		}
 		// --- Game Over ---
@@ -179,7 +179,7 @@ int main()
 		printf("Game Over, press any key to continue <(^_^)> : ");getch();
 
 		// Menampilkan tampilan Game Over
-		GameOver(currentPlayer, playerName, roundPlayed, maxRound, timeConsume, boardSize, level);
+		GameOver(currentPlayer, playerName, roundPlayed, maxRound, timeConsume, boardSize, level, isWin);
 		
 		// Menghapus papan saat ini
 		DeleteBoard(board, boardSize);
@@ -545,14 +545,13 @@ void ChooseBoard(int *boardSize)
 	}while(*boardSize == 0);
 }
 
-void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize, char level[20])
+void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int maxRound, int timeConsume, int boardSize, char level[20], int isWin)
 {
 	char winner[NameLength];
 	int choice;
-	int isWin;
 	int i;
 	
-	if(roundPlayed != maxRound) // jika ada pemenang
+	if(isWin > 0) // jika ada pemenang
 	{
 		if(currentPlayer == 1)
 			strcpy(winner, playerName.NameP2);
@@ -561,10 +560,7 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 			
 		for(i = 0; winner[i]; i++)
 			winner[i] = tolower(winner[i]);
-		
-		isWin = 1;
-	}else if(roundPlayed == maxRound) // jika tidak ada pemenang
-		isWin = 0;
+	}
 	
 	// Menulis data ke file higscore
 	if(isWin == 1)
