@@ -1217,7 +1217,9 @@ void RandomSmartMove(char **board, MoveFormat *computerMove,int boardSize)
 		winMove = 1;
 	
 	// mencari gerakan untuk mencegah kemenangan player
-	*computerMove = GetBlockMove(board, boardSize);
+	if(winMove == 0)
+		*computerMove = GetBlockMove(board, boardSize);
+		
 	if(computerMove->row != -1)
 		blockMove = 1;
 	
