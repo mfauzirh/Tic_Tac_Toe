@@ -1,3 +1,13 @@
+/* 
+Program 	: 	TicTacToe_MFauziRH_SyahdaADUT_RijalAORS.c
+Deskripsi 	:	Program Permainan Tic Tac Toe [Tugas Besar]
+Nama/NIM 	: 	Muhammad Fauzi Rizki Hamdalah/201524015
+				Rijal Azmi Oktoro Rahmatika S/201524025
+				Syahda Afia Dhiya Ulhaq Tajudin/201524030
+Tanggal 	:	18 Februari 2021/ ver 1.0
+Compiler 	:	DevC++ TDM-GCC 4.9.2 64-bit Release
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -456,6 +466,8 @@ void DrawBoard(char **board, int boardSize)
 /* =====================================*/
 // dibawah ini merupakan kumpulan modul-modul untuk mengurus logika program
 
+/* Navigasi */
+
 void MainMenu()
 {
 	// Modul Navigasi Main menu
@@ -582,7 +594,9 @@ void GameOver(int currentPlayer, PlayerName playerName, int roundPlayed, int max
 	}while(choice != 1 && choice != 2);
 }
 
-/* Ini adalah modul untuk membuat papan permainan */
+/* Board Modul*/
+
+// Ini adalah modul untuk membuat papan permainan 
 char** CreateBoard(int boardSize)
 {
 	char **board;
@@ -602,6 +616,17 @@ char** CreateBoard(int boardSize)
 	
 	return board; // mengembalikan papan yang telah dialokasikan memory
 }
+
+// Dealocate memory from board
+void DeleteBoard(char **board, int boardSize)
+{
+	int i;
+	for(i = 0; i < boardSize; i++)
+		free(board[i]);
+	free(board);
+}
+
+/* Win Modul */
 
 int StreakRule(int boardSize)
 {
@@ -843,7 +868,7 @@ int CheckMainDiagonal(char **board, int boardSize)
 	return 0;
 }
 
-/* Memeriksa kemenangan di diagonal sekunder */
+// Memeriksa kemenangan di diagonal sekunder 
 int CheckSecDiagonal(char **board, int boardSize)
 {
 	// asumsi acuan diagonal ke-0 pada secondary diagonal untuk mengecek diagonal berikutnya
@@ -949,7 +974,7 @@ int CheckSecDiagonal(char **board, int boardSize)
 	return 0;
 }
 
-/* Modul untuk men-cek kemenangan */
+// Modul untuk men-cek kemenangan 
 int CheckWin(char **board, int boardSize)
 {
 	/* mencek kemenangan secara horizontal, vertical dan diagonal */
@@ -958,6 +983,8 @@ int CheckWin(char **board, int boardSize)
 	else
 		return 0;
 }
+
+/* Make Move in board*/
 
 void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int opponent, int waktu)
 {
@@ -981,6 +1008,27 @@ void MakeMove(char **board, int boardSize, int *currentPlayer, int gameMode, int
 	/* Fill to Board */
 	FillBoard(board, Move, boardSize, currentPlayer);
 }
+
+void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer)
+{
+	// Melukis simbol dipapan berdasarkan gerakan yang telah di dapat
+	if(Move.row < boardSize && Move.col < boardSize && board[Move.row][Move.col] == ' ')
+	{
+		if(*currentPlayer == 1)
+		{
+			board[Move.row][Move.col] = 'X';
+			*currentPlayer = 2;
+		}	
+		else
+		{
+			board[Move.row][Move.col] = 'O';
+			*currentPlayer = 1;
+		}	
+					
+	}
+}
+
+/* Get User Input */
 
 int InputWithTime(unsigned int timeout)
 {
@@ -1025,6 +1073,21 @@ void GetUserInput(char **board, MoveFormat *playerMove, int *currentPlayer, int 
 		isValid = isValidInput(board, playerMove, boardSize);
 	}while(isValid == 0);
 }
+
+int isValidInput(char **board, MoveFormat *playerMove, int boardSize)
+{
+	if((playerMove->row < 0 || playerMove->row >= boardSize ) || (playerMove->col < 0 || playerMove->col >= boardSize))
+		return 0;
+	else
+	{
+		if(board[playerMove->row][playerMove->col] != ' ')
+			return 0;
+		else
+			return 1;
+	}
+}
+
+/* Generate AI Input */
 
 MoveFormat GetWinningMove(char **board, int boardSize)
 {
@@ -1228,37 +1291,7 @@ void RandomSmartMove(char **board, MoveFormat *computerMove,int boardSize)
 		RandomBasedBoard(board, computerMove, boardSize);
 }
 
-int isValidInput(char **board, MoveFormat *playerMove, int boardSize)
-{
-	if((playerMove->row < 0 || playerMove->row >= boardSize ) || (playerMove->col < 0 || playerMove->col >= boardSize))
-		return 0;
-	else
-	{
-		if(board[playerMove->row][playerMove->col] != ' ')
-			return 0;
-		else
-			return 1;
-	}
-}
-
-void FillBoard(char **board, MoveFormat Move, int boardSize, int *currentPlayer)
-{
-	// Melukis simbol dipapan berdasarkan gerakan yang telah di dapat
-	if(Move.row < boardSize && Move.col < boardSize && board[Move.row][Move.col] == ' ')
-	{
-		if(*currentPlayer == 1)
-		{
-			board[Move.row][Move.col] = 'X';
-			*currentPlayer = 2;
-		}	
-		else
-		{
-			board[Move.row][Move.col] = 'O';
-			*currentPlayer = 1;
-		}	
-					
-	}
-}
+/* Player Config & Other */
 
 void InputName(PlayerName *playerName, int gameMode)
 {
@@ -1302,15 +1335,6 @@ void InputName(PlayerName *playerName, int gameMode)
 	
 }
 
-/* Dealocate memory from board */
-void DeleteBoard(char **board, int boardSize)
-{
-	int i;
-	for(i = 0; i < boardSize; i++)
-		free(board[i]);
-	free(board);
-}
-
 void PlayMusic(int list)
 {
 	// 1 for skip soundeffect
@@ -1329,7 +1353,8 @@ void PlayMusic(int list)
 	}
 }
 
-// Highscore Modul : referensi imam saiful
+/* Highscore Modul : referensi imam saiful */
+
 void Highscores()
 {
 	int amount, i, criteria = 1;
